@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Pidjou</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+*, *::before, *::after { -webkit-tap-highlight-color: transparent; }
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+#pidjou-root, #pidjou-root * { box-sizing: border-box; }
+#pidjou-root {
+  --felt-dark: #0e2a1f;
+  --felt: #16402e;
+  --felt-light: #1e523b;
+  --ink: #0c1a13;
+  --parchment: #f2e8d0;
+  --parchment-dim: #e4d6ae;
+  --brass: #c99a3e;
+  --brass-bright: #e0b552;
+  --rust: #a6432e;
+  --text-light: #f2ecd8;
+  --text-dim: #b9c9bd;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-light);
+  background: radial-gradient(ellipse at top, var(--felt-light), var(--felt-dark) 70%);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+#pidjou-root .disp { font-family: 'Fraunces', serif; }
+#pidjou-root .mono { font-family: 'Space Mono', monospace; }
+
+#pidjou-root button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+}
+#pidjou-root button:active { transform: translateY(1px); }
+#pidjou-root button:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+#pidjou-root button.btn-primary {
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #2a1c05;
+  font-weight: 700;
+  padding: 12px 22px;
+  font-size: 15px;
+  box-shadow: 0 2px 0 #8a6825, 0 6px 14px rgba(0,0,0,.35);
+}
+#pidjou-root button.btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+#pidjou-root button.btn-ghost {
+  background: transparent;
+  color: var(--text-light);
+  border: 1px solid rgba(242,232,208,.35);
+  padding: 10px 18px;
+  font-size: 14px;
+}
+#pidjou-root button.btn-ghost:hover:not(:disabled) { background: rgba(242,232,208,.08); }
+#pidjou-root button.btn-small {
+  padding: 7px 12px;
+  font-size: 13px;
+  background: rgba(242,232,208,.12);
+  color: var(--text-light);
+  border: 1px solid rgba(242,232,208,.25);
+}
+#pidjou-root button.btn-small:hover:not(:disabled) { background: rgba(242,232,208,.2); }
+#pidjou-root button.lang-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: rgba(242,232,208,.08);
+  color: var(--text-dim);
+  border: 1px solid rgba(242,232,208,.2);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: .5px;
+}
+#pidjou-root button.lang-btn.active {
+  background: var(--brass);
+  color: #2a1c05;
+  border-color: var(--brass);
+  font-weight: 700;
+}
+#pidjou-root button.bid-btn {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 17px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 3px 0 #a89568;
+}
+#pidjou-root button.bid-btn:hover:not(:disabled) { filter: brightness(1.05); }
+#pidjou-root input[type=text] {
+  font-family: 'Space Mono', monospace;
+  background: rgba(242,232,208,.1);
+  border: 1px solid rgba(242,232,208,.35);
+  color: var(--text-light);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  width: 100%;
+}
+#pidjou-root input[type=text]::placeholder { color: rgba(242,232,208,.4); }
+#pidjou-root input[type=text]:focus, #pidjou-root button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+.pj-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(242,232,208,.12);
+  background: rgba(0,0,0,.15);
+  gap: 10px; flex-wrap: wrap;
+}
+.pj-brand { font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px; letter-spacing: .5px; color: var(--brass-bright); }
+.pj-brand span { color: var(--text-dim); font-family: 'Inter'; font-weight: 500; font-size: 12px; display:block; letter-spacing: 1.5px; text-transform: uppercase; margin-top: -2px;}
+.pj-room-chip {
+  font-family: 'Space Mono', monospace;
+  background: rgba(242,232,208,.1);
+  border: 1px dashed rgba(242,232,208,.35);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+.pj-lang-toggle { display: flex; gap: 4px; }
+
+.pj-center { max-width: 560px; margin: 0 auto; padding: 48px 20px; }
+.pj-home-hero { text-align: center; margin-bottom: 34px; }
+.pj-home-hero h1 { font-size: 46px; margin: 0 0 6px; letter-spacing: .5px; }
+.pj-home-hero p { color: var(--text-dim); font-size: 15px; line-height: 1.5; max-width: 380px; margin: 0 auto; }
+.pj-card-suit-row { font-size: 22px; letter-spacing: 10px; margin: 14px 0 22px; opacity: .8; }
+
+.pj-panel {
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(242,232,208,.14);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.pj-panel h3 { font-family: 'Fraunces', serif; margin: 0 0 14px; font-size: 17px; font-weight: 600; color: var(--brass-bright); }
+.pj-field-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 6px; display: block; }
+.pj-row { display: flex; gap: 10px; }
+.pj-row > * { flex: 1; }
+.pj-select {
+  font-family: 'Inter', sans-serif;
+  background: rgba(242,232,208,.1);
+  border: 1px solid rgba(242,232,208,.35);
+  color: var(--text-light);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+.pj-select option { background: var(--felt-dark); color: var(--text-light); }
+.pj-divider-word {
+  text-align: center; color: var(--text-dim); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  margin: 26px 0; position: relative;
+}
+.pj-divider-word:before, .pj-divider-word:after {
+  content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(242,232,208,.15);
+}
+.pj-divider-word:before { left: 0; } .pj-divider-word:after { right: 0; }
+
+.pj-lobby-code { text-align: center; margin: 6px 0 26px; }
+.pj-lobby-code .code { font-family: 'Space Mono', monospace; font-size: 40px; letter-spacing: 12px; color: var(--brass-bright); font-weight: 700; }
+.pj-lobby-code .hint { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
+.pj-seat-list { list-style: none; margin: 0; padding: 0; }
+.pj-seat-list li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 4px; border-bottom: 1px solid rgba(242,232,208,.08);
+  font-size: 15px;
+}
+.pj-seat-list li:last-child { border-bottom: none; }
+.pj-seat-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--felt-light); border: 1px solid var(--brass);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-family: 'Space Mono'; color: var(--brass-bright);
+  flex-shrink: 0;
+}
+.pj-seat-empty { color: var(--text-dim); font-style: italic; font-size: 14px; }
+
+.pj-table-wrap { max-width: 780px; margin: 0 auto; padding: 16px 14px 90px; }
+.pj-players-strip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px; }
+.pj-player-chip {
+  flex: 0 0 auto;
+  background: rgba(0,0,0,.22); border: 1px solid rgba(242,232,208,.15);
+  border-radius: 10px; padding: 8px 12px; min-width: 92px;
+  text-align: center; position: relative;
+}
+.pj-player-chip.is-turn { border-color: var(--brass-bright); box-shadow: 0 0 0 1px var(--brass-bright), 0 0 14px rgba(201,154,62,.35); }
+.pj-player-chip.is-me { background: rgba(201,154,62,.12); }
+.pj-player-chip .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+.pj-player-chip .meta { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+.pj-player-chip .tag { position: absolute; top: -8px; right: 6px; font-size: 9px; background: var(--brass); color: #2a1c05; padding: 1px 6px; border-radius: 8px; font-weight: 700; letter-spacing: .5px; }
+
+.pj-felt {
+  background: radial-gradient(ellipse at center, var(--felt-light), var(--felt) 75%);
+  border: 6px solid #0a1e15;
+  border-radius: 18px;
+  box-shadow: inset 0 0 40px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  padding: 26px 16px;
+  min-height: 190px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.pj-trick-area { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 78px; align-items: center;}
+.pj-trick-card { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pj-trick-card .who { font-size: 10px; color: var(--text-dim); letter-spacing: .5px; }
+.pj-status-line { font-family: 'Fraunces', serif; font-size: 16px; text-align: center; color: var(--parchment); }
+.pj-status-line.mine { color: var(--brass-bright); font-weight: 700; }
+.pj-last-trick {
+  font-size: 12.5px; color: var(--text-dim); text-align: center;
+  background: rgba(0,0,0,.22); border: 1px solid rgba(242,232,208,.15);
+  padding: 6px 14px; border-radius: 20px;
+}
+.pj-last-trick b { color: var(--brass-bright); }
+.pj-last-trick-label { text-transform: uppercase; letter-spacing: .5px; font-size: 10px; opacity: .7; margin-right: 4px; }
+.pj-trump-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,.3); border: 1px solid var(--brass);
+  padding: 4px 12px; border-radius: 20px; font-size: 13px; color: var(--brass-bright);
+}
+
+.pj-card {
+  width: 54px; height: 76px;
+  background: var(--parchment);
+  border-radius: 7px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px;
+  color: var(--ink); position: relative; flex-shrink: 0;
+}
+.pj-card.red { color: var(--rust); }
+.pj-card .suit { font-size: 20px; margin-top: 2px; }
+.pj-card.mini { width: 40px; height: 56px; font-size: 14px; }
+.pj-card.mini .suit { font-size: 14px; }
+.pj-card.playable { cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,.4), 0 0 0 2px var(--brass-bright); }
+.pj-card.playable:hover { transform: translateY(-6px); }
+.pj-card.unplayable { opacity: .4; cursor: not-allowed; }
+.pj-card.selected { transform: translateY(-10px); box-shadow: 0 6px 12px rgba(0,0,0,.5), 0 0 0 2px var(--brass-bright); }
+
+.pj-hand-wrap {
+  position: sticky; bottom: 0;
+  background: linear-gradient(180deg, transparent, rgba(6,16,11,.92) 30%);
+  padding: 18px 4px 10px;
+  margin: 0 -14px;
+}
+.pj-hand-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 0 10px; }
+
+.pj-bid-panel { text-align: center; }
+.pj-bid-options { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+
+.pj-log {
+  font-size: 12.5px; color: var(--text-dim); max-height: 90px; overflow-y: auto;
+  border-top: 1px dashed rgba(242,232,208,.15); padding-top: 10px; margin-top: 4px;
+  line-height: 1.6;
+}
+
+.pj-ledger {
+  background: var(--parchment); color: var(--ink); border-radius: 12px;
+  padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,.35);
+  font-family: 'Space Mono', monospace; font-size: 12.5px;
+  position: relative;
+}
+.pj-ledger:before {
+  content: '📌'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-8deg);
+  font-size: 20px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4));
+}
+.pj-ledger h3 { font-family: 'Fraunces', serif; font-size: 14px; text-align: center; margin: 4px 0 12px; letter-spacing: 1px; text-transform: uppercase; }
+.pj-ledger table { width: 100%; border-collapse: collapse; }
+.pj-ledger th, .pj-ledger td { padding: 5px 6px; text-align: center; border-bottom: 1px solid rgba(12,26,19,.15); }
+.pj-ledger th { font-weight: 700; border-bottom: 2px solid var(--ink); }
+.pj-ledger td.name-col, .pj-ledger th.name-col { text-align: left; }
+
+.pj-summary-points { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.pj-summary-points .pt-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 10px; background: rgba(0,0,0,.18); border-radius: 6px; }
+.pj-summary-points .pt-row .label { color: var(--brass-bright); font-weight: 600; }
+.pj-summary-points .pt-row .who { color: var(--text-dim); }
+
+.pj-toast {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--text-light); padding: 10px 18px;
+  border-radius: 8px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  z-index: 50; border: 1px solid var(--brass); max-width: 90%; text-align: center;
+}
+
+.pj-rules-toggle { text-align: center; margin-top: 6px; }
+.pj-rules-toggle a { color: var(--text-dim); font-size: 12.5px; cursor: pointer; text-decoration: underline; }
+.pj-rules-box { font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.pj-rules-box b { color: var(--text-light); }
+
+.pj-winner-banner { text-align: center; padding: 30px 16px; }
+.pj-winner-banner .crown { font-size: 40px; }
+.pj-winner-banner h2 { font-size: 30px; margin: 8px 0 4px; color: var(--brass-bright); }
+
+@media (max-width: 480px) {
+  .pj-home-hero h1 { font-size: 34px; }
+  .pj-lobby-code .code { font-size: 30px; letter-spacing: 8px; }
+  .pj-card { width: 46px; height: 64px; font-size: 16px; }
+  .pj-card .suit { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="pidjou-root">
+  <div class="pj-topbar">
+    <div class="pj-brand">Pidjou<span id="pj-tagline"></span></div>
+    <div id="pj-topbar-right"></div>
+  </div>
+  <div id="pj-app"></div>
+  <div id="pj-toast-host"></div>
+</div>
+
+<script>
+(function(){
+
+var SUITS = ["S","H","D","C"];
+var SUIT_SYMBOL = { S:"\u2660", H:"\u2665", D:"\u2666", C:"\u2663" };
+var RED_SUITS = ["H","D"];
+var RANKS = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+var RANK_VALUE = {}; RANKS.forEach(function(r,i){ RANK_VALUE[r] = i+2; });
+var GAME_POINT_VALUE = { A:4, K:3, Q:2, J:1, "10":10 };
+var MAX_PLAYERS = 5;
+var MIN_PLAYERS = 2;
+var CARDS_PER_HAND = 6;
+var MAX_BID = 9;
+var POINT_VALUE = { High: 1, Low: 1, Jack: 1, Pidjou: 5, Game: 1 };
+var DEFAULT_TARGET = 35;
+var LOG_CAP = 40;
+
+// ============================== TRANSLATIONS ==============================
+var STR = {
+  fr: {
+    tagline: "Authentiquement de Saint-Vincent",
+    heroDesc: "Pidjou est un jeu de cartes traditionnel de Saint-Vincent-et-les-Grenadines, à jouer de 2 à 5, où que vous soyez. Crée une table ou rejoins celle d'un ami avec son code.",
+    createTableTitle: "Créer une table",
+    yourName: "Ton prénom",
+    createTableBtn: "Créer la table",
+    orWord: "ou",
+    joinTableTitle: "Rejoindre une table",
+    tableCode: "Code de la table",
+    joinBtn: "Rejoindre",
+    showRules: "Voir les règles du jeu",
+    hideRules: "Masquer les règles",
+    shareCodeHint: "Partage ce code pour que les autres rejoignent",
+    playersTitle: "Joueurs",
+    host: "hôte",
+    youTag: "(toi)",
+    emptySeat: "place libre",
+    targetScoreTitle: "Score cible",
+    firstDealerTitle: "Qui distribue en premier ?",
+    waitingPlayers: "En attente d'au moins 2 joueurs\u2026",
+    dealStartBtn: "Distribuer et commencer",
+    leaveBtn: "Quitter",
+    dealerTag: "Donneur",
+    pitcherTag: "Pitcher",
+    cardWord: "carte",
+    cardWordPlural: "cartes",
+    waitingWord: "en attente",
+    passWord: "passe",
+    bidWord: "mise {n}",
+    yourTurnBid: "À toi d'enchérir",
+    thinkingBid: "{player} réfléchit à son enchère\u2026",
+    yourTurnTrump: "Choisis l'atout",
+    thinkingTrump: "{player} choisit l'atout\u2026",
+    chooseTrumpTitle: "Quel atout ?",
+    chooseTrumpHint: "Tu garderas tes cartes de cette couleur, le reste sera échangé contre de nouvelles cartes.",
+    yourBidTitle: "Ton enchère",
+    currentBid: "Mise actuelle : {amount} par {player}",
+    noBidYet: "Aucune mise encore.",
+    passBtn: "Passer",
+    keepBidBtn: "Garder ma mise ({amount})",
+    cantPass: "Impossible de passer",
+    mustBidAtLeast1: "Tu dois miser au moins 1",
+    trumpWillBeChosen: "L'atout sera choisi par {pitcher}",
+    trumpBadge: "Atout {suit}",
+    yourTurnPlay: "À toi de jouer",
+    playingNow: "{player} joue\u2026",
+    trickPending: "Pli en attente\u2026",
+    lastTrickLabel: "Dernier pli :",
+    wonByTrump: "a coupé avec {card}",
+    wonByLedSuit: "remporte avec {card}",
+    liveNotYet: "pas encore",
+    liveGameTie: "égalité ({n} pts) pour l'instant",
+    livePointsTitle: "Points en cours",
+    showLivePoints: "Voir les points en cours",
+    hideLivePoints: "Masquer les points en cours",
+    playBtn: "Jouer {card}",
+    handResultTitle: "Résultat de la manche",
+    madeContract: "{pitcher} réussit son contrat.",
+    failedContract: "{pitcher} échoue son contrat de {bid}.",
+    scoresDivider: "scores",
+    pitcherNote: "(pitcher, mise {bid})",
+    nextHandBtn: "Manche suivante",
+    winnerBanner: "{winner} gagne la partie\u00a0!",
+    withPoints: "avec {n} points",
+    newGameBtn: "Nouvelle partie",
+    ledgerTitle: "Feuille de marque",
+    playerCol: "Joueur",
+    scoreCol: "Score",
+    ledgerFooter: "Objectif : {target} pts \u00b7 Manche {hand}",
+    showLedger: "Voir la feuille de marque",
+    hideLedger: "Masquer la feuille de marque",
+    notDealt: "non distribué",
+    jackDetail: "valet d'atout",
+    pidjouDetail: "5 d'atout",
+    tieOrNone: "égalité / aucun",
+    cardPointsSuffix: "{n} pts de cartes",
+    gameTieDetail: "égalité ({n} pts) \u2014 au pitcher",
+    toastEnterName: "Entre ton prénom.",
+    toastEnterCodeName: "Entre le code de la table et ton prénom.",
+    toastTableNotFound: "Table introuvable. Vérifie le code.",
+    toastGameStarted: "La partie a déjà commencé sur cette table.",
+    toastTableFull: "Table complète (5 joueurs max).",
+    toastRoomNotFound: "Salle introuvable.",
+    toastNetworkError: "Problème réseau, réessaie.",
+    toastInvalidTarget: "Le score cible doit être entre 5 et 200.",
+    toastCodeCopied: "Code copié : {code}",
+    toastCode: "Code : {code}",
+    toastTargetSaved: "Score cible enregistré.",
+    validateBtn: "Valider",
+    errNeed2: "Il faut au moins 2 joueurs.",
+    suit_S: "Pique", suit_H: "Cœur", suit_D: "Carreau", suit_C: "Trèfle",
+    log_tableCreated: "La table a été créée par {host}.",
+    log_playerJoined: "{name} rejoint la table.",
+    log_dealStart: "Manche {n} \u2014 {dealer} distribue.",
+    log_bidPass: "{player} passe.",
+    log_bidAmount: "{player} mise {amount}.",
+    log_bidForced: "{player} est forcé de miser 1.",
+    log_autoBid1: "{player} ouvre automatiquement à 1.",
+    log_keepBid: "{player} garde sa mise à 1.",
+    log_bidWon: "{pitcher} remporte l'enchère à {amount}. À {pitcher} de choisir l'atout.",
+    log_trumpSet: "Atout : {suit}.",
+    log_discardDraw: "{player} garde {kept} carte(s) d'atout et pioche {drawn}.",
+    log_cardPlayed: "{player} joue {card}.",
+    log_trickWon: "{player} remporte le pli.",
+    log_handMadeResult: "{pitcher} réussit son contrat ({bid}) et marque {earned} pt(s).",
+    log_handFailedResult: "{pitcher} échoue son contrat de {bid} et perd {bid} pt(s).",
+    log_gameWon: "\ud83c\udfc6 {winner} remporte la partie avec {score} points\u00a0!",
+    log_newGame: "\u2014 Nouvelle partie \u2014",
+    rulesHtml: "<p><b>But :</b> être le premier à atteindre {target} points.</p>"
+      + "<p><b>Donne :</b> 6 cartes chacun. Le joueur à gauche du donneur enchérit en premier.</p>"
+      + "<p><b>Enchères :</b> chacun mise un nombre de points (1 à 5) ou passe. Le donneur ne peut pas passer si tout le monde a passé avant lui : il est forcé de miser au moins 1.</p>"
+      + "<p><b>Atout :</b> celui qui remporte l'enchère (le \u00ab\u00a0pitcher\u00a0\u00bb) annonce directement la couleur d'atout.</p>"
+      + "<p><b>Échange :</b> tout le monde (pitcher inclus) garde uniquement ses cartes de la couleur d'atout, défausse le reste, et pioche pour revenir à 6 cartes.</p>"
+      + "<p><b>Jouer :</b> il faut suivre la couleur demandée si possible. Si tu as la couleur demandée, tu ne peux pas couper à la place. Si tu ne l'as pas, tu joues ce que tu veux, y compris l'atout \u2014 et l'atout bat toujours les autres couleurs.</p>"
+      + "<p><b>Points par manche (9 max) :</b> High (1 pt, plus gros atout joué), Low (1 pt, plus petit atout joué \u2014 pour son joueur, même si un autre remporte le pli), Jack (1 pt, qui remporte le pli du valet d'atout), <b>Pidjou (5 pts !)</b> qui remporte le pli du 5 d'atout, Game (1 pt, qui cumule le plus de valeur dans les plis qu'il a remportés : As=4, Roi=3, Dame=2, Valet=1, 10=10 \u2014 en cas d'égalité, le point va au pitcher).</p>"
+      + "<p><b>Le pitcher</b> ne marque ses points que s'il atteint sa mise, sinon il perd ce nombre de points (score négatif possible).</p>"
+  },
+  en: {
+    tagline: "Genuinely from St. Vincent",
+    heroDesc: "Pidjou is a traditional card game from Saint Vincent & the Grenadines, for 2 to 5 players, wherever you are. Create a table or join a friend's with their code.",
+    createTableTitle: "Create a table",
+    yourName: "Your name",
+    createTableBtn: "Create table",
+    orWord: "or",
+    joinTableTitle: "Join a table",
+    tableCode: "Table code",
+    joinBtn: "Join",
+    showRules: "Show the rules",
+    hideRules: "Hide the rules",
+    shareCodeHint: "Share this code so others can join",
+    playersTitle: "Players",
+    host: "host",
+    youTag: "(you)",
+    emptySeat: "open seat",
+    targetScoreTitle: "Target score",
+    firstDealerTitle: "Who deals first?",
+    waitingPlayers: "Waiting for at least 2 players\u2026",
+    dealStartBtn: "Deal and start",
+    leaveBtn: "Leave",
+    dealerTag: "Dealer",
+    pitcherTag: "Pitcher",
+    cardWord: "card",
+    cardWordPlural: "cards",
+    waitingWord: "waiting",
+    passWord: "pass",
+    bidWord: "bid {n}",
+    yourTurnBid: "Your turn to bid",
+    thinkingBid: "{player} is thinking\u2026",
+    yourTurnTrump: "Choose trump",
+    thinkingTrump: "{player} is choosing trump\u2026",
+    chooseTrumpTitle: "Which suit is trump?",
+    chooseTrumpHint: "You'll keep your cards of this suit; the rest get swapped for new cards.",
+    yourBidTitle: "Your bid",
+    currentBid: "Current bid: {amount} by {player}",
+    noBidYet: "No bid yet.",
+    passBtn: "Pass",
+    keepBidBtn: "Keep my bid ({amount})",
+    cantPass: "Can't pass",
+    mustBidAtLeast1: "You must bid at least 1",
+    trumpWillBeChosen: "Trump will be set by {pitcher}",
+    trumpBadge: "Trump {suit}",
+    yourTurnPlay: "Your turn to play",
+    playingNow: "{player} is playing\u2026",
+    trickPending: "Waiting for the trick\u2026",
+    lastTrickLabel: "Last trick:",
+    wonByTrump: "cut with {card}",
+    wonByLedSuit: "wins with {card}",
+    liveNotYet: "not yet",
+    liveGameTie: "tied ({n} pts) for now",
+    livePointsTitle: "Live points",
+    showLivePoints: "Show live points",
+    hideLivePoints: "Hide live points",
+    playBtn: "Play {card}",
+    handResultTitle: "Hand result",
+    madeContract: "{pitcher} makes the bid.",
+    failedContract: "{pitcher} fails the bid of {bid}.",
+    scoresDivider: "scores",
+    pitcherNote: "(pitcher, bid {bid})",
+    nextHandBtn: "Next hand",
+    winnerBanner: "{winner} wins the game!",
+    withPoints: "with {n} points",
+    newGameBtn: "New game",
+    ledgerTitle: "Score sheet",
+    playerCol: "Player",
+    scoreCol: "Score",
+    ledgerFooter: "Target: {target} pts \u00b7 Hand {hand}",
+    showLedger: "Show the score sheet",
+    hideLedger: "Hide the score sheet",
+    notDealt: "not dealt",
+    jackDetail: "trump Jack",
+    pidjouDetail: "trump 5",
+    tieOrNone: "tie / none",
+    cardPointsSuffix: "{n} card points",
+    gameTieDetail: "tie ({n} pts) \u2014 goes to the pitcher",
+    toastEnterName: "Enter your name.",
+    toastEnterCodeName: "Enter the table code and your name.",
+    toastTableNotFound: "Table not found. Check the code.",
+    toastGameStarted: "This table's game has already started.",
+    toastTableFull: "Table is full (5 players max).",
+    toastRoomNotFound: "Room not found.",
+    toastNetworkError: "Network hiccup, try again.",
+    toastInvalidTarget: "Target score must be between 5 and 200.",
+    toastCodeCopied: "Code copied: {code}",
+    toastCode: "Code: {code}",
+    toastTargetSaved: "Target score saved.",
+    validateBtn: "Save",
+    errNeed2: "You need at least 2 players.",
+    suit_S: "Spades", suit_H: "Hearts", suit_D: "Diamonds", suit_C: "Clubs",
+    log_tableCreated: "{host} created the table.",
+    log_playerJoined: "{name} joined the table.",
+    log_dealStart: "Hand {n} \u2014 {dealer} deals.",
+    log_bidPass: "{player} passes.",
+    log_bidAmount: "{player} bids {amount}.",
+    log_bidForced: "{player} is forced to bid 1.",
+    log_autoBid1: "{player} automatically opens at 1.",
+    log_keepBid: "{player} keeps their bid at 1.",
+    log_bidWon: "{pitcher} wins the bid at {amount}. {pitcher} will choose trump.",
+    log_trumpSet: "Trump: {suit}.",
+    log_discardDraw: "{player} keeps {kept} trump card(s) and draws {drawn}.",
+    log_cardPlayed: "{player} plays {card}.",
+    log_trickWon: "{player} wins the trick.",
+    log_handMadeResult: "{pitcher} makes the {bid}-bid contract and scores {earned} pt(s).",
+    log_handFailedResult: "{pitcher} fails the {bid}-bid contract and loses {bid} pt(s).",
+    log_gameWon: "\ud83c\udfc6 {winner} wins the game with {score} points!",
+    log_newGame: "\u2014 New game \u2014",
+    rulesHtml: "<p><b>Goal:</b> be the first to reach {target} points.</p>"
+      + "<p><b>Deal:</b> 6 cards each. The player to the dealer's left bids first.</p>"
+      + "<p><b>Bidding:</b> each player bids a number of points (1 to 5) or passes. The dealer can't pass if everyone else has passed: they're forced to bid at least 1.</p>"
+      + "<p><b>Trump:</b> whoever wins the bid (the \u201cpitcher\u201d) directly announces the trump suit.</p>"
+      + "<p><b>Exchange:</b> everyone (pitcher included) keeps only their cards of the trump suit, discards the rest, and draws back up to 6 cards.</p>"
+      + "<p><b>Playing:</b> follow the suit that was led if you can. If you hold that suit, you must play it \u2014 you can't cut instead. If you don't hold it, you may play anything, including trump \u2014 and trump always beats other suits.</p>"
+      + "<p><b>Points per hand (9 max):</b> High (1 pt, highest trump played), Low (1 pt, lowest trump played \u2014 credited to whoever played it, even if someone else wins that trick), Jack (1 pt, whoever wins the trick with the trump Jack), <b>Pidjou (5 pts!)</b> whoever wins the trick with the trump 5, Game (1 pt, whoever's own captured tricks add up to the most card value: Ace=4, King=3, Queen=2, Jack=1, 10=10 \u2014 on a tie, the point goes to the pitcher).</p>"
+      + "<p><b>The pitcher</b> only scores their earned points if they meet their bid \u2014 otherwise they lose that many points (score can go negative).</p>"
+  }
+};
+
+// ============================== STORAGE (Firebase Realtime Database) ==============================
+// \u2193\u2193\u2193 REMPLACE la ligne ci-dessous par TON URL Firebase (voir les instructions fournies) \u2193\u2193\u2193
+var FIREBASE_DB_URL = "https://pidjou-default-rtdb.europe-west1.firebasedatabase.app";
+// \u2191\u2191\u2191 REMPLACE la ligne ci-dessus par TON URL Firebase \u2191\u2191\u2191
+
+var STORAGE_CONFIGURED = FIREBASE_DB_URL.indexOf("REMPLACE-MOI") === -1;
+
+function roomUrl(code){ return FIREBASE_DB_URL.replace(/\/$/, "") + "/rooms/" + code + ".json"; }
+
+function normalizeRoom(data){
+  if (!data) return data;
+  data.currentTrick = data.currentTrick || [];
+  data.trickLog = data.trickLog || [];
+  data.log = data.log || [];
+  data.hands = data.hands || {};
+  data.scores = data.scores || {};
+  data.stock = data.stock || [];
+  (data.players || []).forEach(function(p){
+    if (!data.hands[p]) data.hands[p] = [];
+    if (typeof data.scores[p] !== "number") data.scores[p] = 0;
+  });
+  if (data.bidding){
+    data.bidding.bids = data.bidding.bids || {};
+    data.bidding.order = data.bidding.order || [];
+  }
+  return data;
+}
+async function loadRoom(code){
+  try {
+    var res = await fetch(roomUrl(code));
+    if (!res.ok) return null;
+    var data = await res.json();
+    return normalizeRoom(data) || null;
+  } catch(e) { return null; }
+}
+async function saveRoom(code, state){
+  await fetch(roomUrl(code), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(state)
+  });
+}
+
+// ============================== CARD HELPERS ==============================
+function makeCard(rank, suit){ return rank + suit; }
+function rankOf(card){ return card.slice(0, -1); }
+function suitOf(card){ return card.slice(-1); }
+function rankVal(card){ return RANK_VALUE[rankOf(card)]; }
+function isRed(card){ return RED_SUITS.indexOf(suitOf(card)) !== -1; }
+function cardSortKey(card){ return SUITS.indexOf(suitOf(card))*100 + rankVal(card); }
+function buildDeck(){
+  var deck = [];
+  for (var s=0;s<SUITS.length;s++) for (var r=0;r<RANKS.length;r++) deck.push(makeCard(RANKS[r], SUITS[s]));
+  return deck;
+}
+function shuffle(arr){
+  var a = arr.slice();
+  for (var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp = a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function genRoomCode(){
+  var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  var s = "";
+  for (var i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+// ============================== GAME LOGIC ==============================
+function freshRoomState(code, hostName){
+  var scores = {}; scores[hostName] = 0;
+  return {
+    code: code, version: 0, createdAt: Date.now(),
+    players: [hostName], targetScore: DEFAULT_TARGET, chosenDealer: hostName,
+    phase: "lobby", dealerIndex: -1, hands: {}, bidding: null,
+    trump: null, pitcher: null, leadIndex: 0, turnIndex: 0,
+    currentTrick: [], trickLog: [], scores: scores,
+    handNumber: 0, lastHandSummary: null, winner: null,
+    log: [ { key: "log_tableCreated", params: { host: hostName } } ]
+  };
+}
+function pushLog(state, key, params){
+  state.log.push({ key: key, params: params || {} });
+  if (state.log.length > LOG_CAP) state.log = state.log.slice(-LOG_CAP);
+}
+function startHand(state){
+  var n = state.players.length;
+  if (state.handNumber === 0 && state.chosenDealer){
+    var chosenIdx = state.players.indexOf(state.chosenDealer);
+    if (chosenIdx !== -1) state.dealerIndex = (chosenIdx - 1 + n) % n;
+  }
+  state.dealerIndex = (state.dealerIndex + 1) % n;
+  var dealer = state.players[state.dealerIndex];
+  var deck = shuffle(buildDeck());
+  var hands = {};
+  state.players.forEach(function(p){ hands[p] = []; });
+  var di = 0;
+  for (var c=0;c<CARDS_PER_HAND;c++){
+    for (var i=0;i<n;i++){ hands[state.players[i]].push(deck[di++]); }
+  }
+  state.players.forEach(function(p){ hands[p].sort(function(a,b){ return cardSortKey(a)-cardSortKey(b); }); });
+  state.hands = hands;
+  state.stock = deck.slice(di);
+
+  // The player to the dealer's left gets an automatic standing bid of 1 (no active turn for it).
+  // Bidding then goes normally from the 2nd player through the dealer, then wraps back to that
+  // first player for one final real turn (raise, or keep their 1).
+  var firstBidder = state.players[(state.dealerIndex+1)%n];
+  var order = [];
+  for (var k=2;k<=n;k++) order.push(state.players[(state.dealerIndex+k)%n]);
+  order.push(firstBidder);
+  var seededBids = {}; seededBids[firstBidder] = 1;
+  state.bidding = { order: order, turnPtr: 0, bids: seededBids, highest: { player: firstBidder, amount: 1 }, firstBidder: firstBidder };
+
+  state.trump = null; state.pitcher = null; state.currentTrick = []; state.trickLog = [];
+  state.exchangeSummary = null; state.lastTrick = null;
+  state.lastHandSummary = null; state.phase = "bidding"; state.handNumber += 1;
+  pushLog(state, "log_dealStart", { n: state.handNumber, dealer: dealer });
+  pushLog(state, "log_autoBid1", { player: firstBidder });
+}
+function placeBid(state, player, amount){
+  if (state.phase !== "bidding") throw new Error("not-bidding-phase");
+  var b = state.bidding;
+  if (b.order[b.turnPtr] !== player) throw new Error("not-your-turn");
+  var isFinalWrapTurn = player === b.firstBidder;
+
+  if (amount === "pass"){
+    // The first bidder's final turn just means "keep my standing 1" — their bid isn't withdrawn.
+    if (!isFinalWrapTurn){
+      b.bids[player] = "pass";
+      pushLog(state, "log_bidPass", { player: player });
+    } else {
+      pushLog(state, "log_keepBid", { player: player });
+    }
+  } else {
+    var min = b.highest.amount + 1;
+    if (amount < min || amount > MAX_BID) throw new Error("invalid-bid");
+    b.bids[player] = amount;
+    b.highest = { player: player, amount: amount };
+    pushLog(state, "log_bidAmount", { player: player, amount: amount });
+  }
+
+  b.turnPtr += 1;
+  if (b.turnPtr >= b.order.length){
+    state.pitcher = b.highest.player;
+    state.leadIndex = state.players.indexOf(state.pitcher);
+    state.turnIndex = state.leadIndex;
+    state.phase = "chooseTrump";
+    pushLog(state, "log_bidWon", { pitcher: state.pitcher, amount: b.highest.amount });
+  }
+}
+function chooseTrump(state, player, suit){
+  if (state.phase !== "chooseTrump") throw new Error("not-choose-trump-phase");
+  if (player !== state.pitcher) throw new Error("not-your-turn");
+  if (SUITS.indexOf(suit) === -1) throw new Error("invalid-suit");
+
+  state.trump = suit;
+  pushLog(state, "log_trumpSet", { suit: "{{suit:" + suit + "}}" });
+
+  // Everyone keeps only trump cards; the rest goes into a shared pool with the leftover stock.
+  var pool = (state.stock || []).slice();
+  var kept = {};
+  state.players.forEach(function(p){
+    var hand = state.hands[p] || [];
+    var trumpCards = hand.filter(function(c){ return suitOf(c) === suit; });
+    var others = hand.filter(function(c){ return suitOf(c) !== suit; });
+    kept[p] = trumpCards;
+    pool = pool.concat(others);
+  });
+  pool = shuffle(pool);
+
+  var summary = [];
+  var pi = 0;
+  state.players.forEach(function(p){
+    var need = CARDS_PER_HAND - kept[p].length;
+    var drawn = pool.slice(pi, pi + need);
+    pi += need;
+    state.hands[p] = kept[p].concat(drawn).sort(function(a,b){ return cardSortKey(a)-cardSortKey(b); });
+    summary.push({ player: p, kept: kept[p].length, drawn: drawn.length });
+    pushLog(state, "log_discardDraw", { player: p, kept: kept[p].length, drawn: drawn.length });
+  });
+  state.stock = pool.slice(pi);
+  state.exchangeSummary = summary;
+
+  state.phase = "playing";
+}
+function legalCards(hand, currentTrick){
+  if (currentTrick.length === 0) return hand.slice();
+  var led = suitOf(currentTrick[0].card);
+  var followers = hand.filter(function(c){ return suitOf(c) === led; });
+  return followers.length ? followers : hand.slice();
+}
+function trickWinnerPlay(trick, trump){
+  var trumps = trick.filter(function(c){ return suitOf(c.card) === trump; });
+  var ledSuit = suitOf(trick[0].card);
+  var pool = trumps.length ? trumps : trick.filter(function(c){ return suitOf(c.card) === ledSuit; });
+  var best = pool[0];
+  pool.forEach(function(c){ if (rankVal(c.card) > rankVal(best.card)) best = c; });
+  return { player: best.player, card: best.card, wonByTrump: trumps.length > 0 };
+}
+function computePointsSnapshot(trickLog, players, trump, forceTieToPitcher, pitcher){
+  var allPlays = [];
+  trickLog.forEach(function(t){ t.cards.forEach(function(c){ allPlays.push({ player: c.player, card: c.card, trickWinner: t.winner }); }); });
+  var trumpPlays = allPlays.filter(function(p){ return suitOf(p.card) === trump; });
+
+  var highPt = null, lowPt = null, jackPt = null, pidjouPt = null;
+  if (trumpPlays.length){
+    var hi = trumpPlays[0], lo = trumpPlays[0];
+    trumpPlays.forEach(function(p){
+      if (rankVal(p.card) > rankVal(hi.card)) hi = p;
+      if (rankVal(p.card) < rankVal(lo.card)) lo = p;
+    });
+    highPt = { player: hi.player, card: hi.card };
+    lowPt = { player: lo.player, card: lo.card };
+  }
+  var jackPlay = trumpPlays.filter(function(p){ return rankOf(p.card) === "J"; })[0];
+  if (jackPlay) jackPt = { player: jackPlay.trickWinner, card: jackPlay.card };
+  var pidjouPlay = trumpPlays.filter(function(p){ return rankOf(p.card) === "5"; })[0];
+  if (pidjouPlay) pidjouPt = { player: pidjouPlay.trickWinner, card: pidjouPlay.card };
+
+  var totals = {};
+  players.forEach(function(p){ totals[p] = 0; });
+  trickLog.forEach(function(t){
+    var val = t.cards.reduce(function(sum,c){ return sum + (GAME_POINT_VALUE[rankOf(c.card)] || 0); }, 0);
+    totals[t.winner] += val;
+  });
+  var gamePt = null;
+  var totalVals = players.map(function(p){ return totals[p]; });
+  var maxTotal = Math.max.apply(null, totalVals);
+  var gameTiedWinners = players.filter(function(p){ return totals[p] === maxTotal; });
+  if (gameTiedWinners.length === 1){
+    gamePt = { player: gameTiedWinners[0], total: maxTotal, tie: false };
+  } else if (forceTieToPitcher){
+    gamePt = { player: pitcher, total: maxTotal, tie: true };
+  } else {
+    gamePt = { player: null, total: maxTotal, tie: true, tiedPlayers: gameTiedWinners };
+  }
+
+  return [
+    { label: "High", winner: highPt ? highPt.player : null, card: highPt ? highPt.card : null, kind: "card", value: POINT_VALUE.High },
+    { label: "Low", winner: lowPt ? lowPt.player : null, card: lowPt ? lowPt.card : null, kind: "card", value: POINT_VALUE.Low },
+    { label: "Jack", winner: jackPt ? jackPt.player : null, kind: "jack", value: POINT_VALUE.Jack },
+    { label: "Pidjou", winner: pidjouPt ? pidjouPt.player : null, kind: "pidjou", value: POINT_VALUE.Pidjou },
+    { label: "Game", winner: gamePt.player, total: gamePt.total, tie: gamePt.tie, kind: "game", value: POINT_VALUE.Game }
+  ];
+}
+function playCard(state, player, card){
+  if (state.phase !== "playing") throw new Error("not-playing-phase");
+  var n = state.players.length;
+  if (state.players[state.turnIndex] !== player) throw new Error("not-your-turn");
+  var hand = state.hands[player];
+  if (hand.indexOf(card) === -1) throw new Error("card-not-in-hand");
+  var legal = legalCards(hand, state.currentTrick);
+  if (legal.indexOf(card) === -1) throw new Error("must-follow-suit");
+
+  state.hands[player] = hand.filter(function(c){ return c !== card; });
+  state.currentTrick.push({ player: player, card: card });
+  pushLog(state, "log_cardPlayed", { player: player, card: "{{card:" + card + "}}" });
+
+  if (state.currentTrick.length === n){
+    var win = trickWinnerPlay(state.currentTrick, state.trump);
+    state.trickLog.push({ winner: win.player, cards: state.currentTrick });
+    state.lastTrick = { winner: win.player, card: win.card, wonByTrump: win.wonByTrump, cards: state.currentTrick };
+    pushLog(state, "log_trickWon", { player: win.player });
+    state.currentTrick = [];
+    state.leadIndex = state.players.indexOf(win.player);
+    state.turnIndex = state.leadIndex;
+    var handEmpty = state.players.every(function(p){ return state.hands[p].length === 0; });
+    if (handEmpty){ resolveHand(state); return; }
+  } else {
+    state.turnIndex = (state.turnIndex + 1) % n;
+  }
+}
+function resolveHand(state){
+  var trump = state.trump;
+  var points = computePointsSnapshot(state.trickLog, state.players, trump, true, state.pitcher);
+
+  var earned = {};
+  state.players.forEach(function(p){ earned[p] = 0; });
+  points.forEach(function(pt){ if (pt.winner) earned[pt.winner] += pt.value; });
+
+  var bidAmount = state.bidding.highest.amount;
+  var pitcher = state.pitcher;
+  var pitcherMade = earned[pitcher] >= bidAmount;
+
+  var deltas = {};
+  state.players.forEach(function(p){
+    deltas[p] = (p === pitcher) ? (pitcherMade ? earned[p] : -bidAmount) : earned[p];
+  });
+  state.players.forEach(function(p){ state.scores[p] = (state.scores[p]||0) + deltas[p]; });
+
+  state.lastHandSummary = { points: points, pitcher: pitcher, bid: bidAmount, made: pitcherMade, earned: earned, deltas: deltas, trump: trump };
+  state.phase = "handSummary";
+  if (pitcherMade) pushLog(state, "log_handMadeResult", { pitcher: pitcher, bid: bidAmount, earned: earned[pitcher] });
+  else pushLog(state, "log_handFailedResult", { pitcher: pitcher, bid: bidAmount });
+
+  var winner = null;
+  if (pitcherMade && state.scores[pitcher] >= state.targetScore){
+    winner = pitcher;
+  } else {
+    var candidates = state.players.filter(function(p){ return state.scores[p] >= state.targetScore; });
+    if (candidates.length){
+      winner = candidates.reduce(function(best,p){ return state.scores[p] > state.scores[best] ? p : best; }, candidates[0]);
+    }
+  }
+  if (winner){
+    state.winner = winner; state.phase = "gameOver";
+    pushLog(state, "log_gameWon", { winner: winner, score: state.scores[winner] });
+  }
+}
+
+// ============================== CLIENT RUNTIME ==============================
+var client = { myName: null, roomCode: null, room: null, busy: false, pollTimer: null,
+  selectedCard: null, showRules: false, ledgerOpen: false, pointsOpen: false,
+  joinCodeDraft: "", joinNameDraft: "", homeNameDraft: "", lang: "fr" };
+
+function esc(s){ return String(s).replace(/[&<>"']/g, function(m){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]; }); }
+
+function t(key, vars){
+  var dict = STR[client.lang] || STR.fr;
+  var s = dict[key] !== undefined ? dict[key] : (STR.fr[key] !== undefined ? STR.fr[key] : key);
+  if (vars){
+    Object.keys(vars).forEach(function(k){
+      var v = vars[k];
+      if (typeof v === "string" && v.indexOf("{{suit:") === 0){
+        var suitCode = v.slice(7, -2);
+        v = SUIT_SYMBOL[suitCode] + " " + dict["suit_" + suitCode];
+      } else if (typeof v === "string" && v.indexOf("{{card:") === 0){
+        var cardCode = v.slice(7, -2);
+        v = rankOf(cardCode) + SUIT_SYMBOL[suitOf(cardCode)];
+      }
+      s = s.split("{" + k + "}").join(v);
+    });
+  }
+  return s;
+}
+function cardsLabel(n){ return n + " " + (n === 1 ? t("cardWord") : t("cardWordPlural")); }
+function suitFullLabel(suit){
+  var dict = STR[client.lang] || STR.fr;
+  return SUIT_SYMBOL[suit] + " " + dict["suit_" + suit];
+}
+
+function showToast(msg){
+  var host = document.getElementById("pj-toast-host");
+  var el = document.createElement("div");
+  el.className = "pj-toast";
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 3200);
+}
+
+function toastKeyForError(msg){
+  var map = {
+    "not-bidding-phase": "toastNetworkError", "not-your-turn": "toastNetworkError",
+    "dealer-must-bid": "mustBidAtLeast1", "invalid-bid": "toastNetworkError",
+    "not-playing-phase": "toastNetworkError", "card-not-in-hand": "toastNetworkError",
+    "must-follow-suit": "toastNetworkError", "invalid-target": "toastInvalidTarget"
+  };
+  return map[msg] || "toastNetworkError";
+}
+
+async function mutate(fn, opts){
+  opts = opts || {};
+  if (client.busy) return false;
+  client.busy = true;
+  render();
+  try {
+    var latest = await loadRoom(client.roomCode);
+    if (!latest){ showToast(t("toastRoomNotFound")); client.busy = false; render(); return false; }
+    var next;
+    try { next = fn(JSON.parse(JSON.stringify(latest))); }
+    catch(err){
+      showToast(t(toastKeyForError(err.message)));
+      client.room = latest; client.busy = false; render();
+      return false;
+    }
+    if (next === false){ client.room = latest; client.busy = false; render(); return false; }
+    next.version = (latest.version||0) + 1;
+    await saveRoom(client.roomCode, next);
+    client.room = next;
+    if (opts.selectClear) client.selectedCard = null;
+    return true;
+  } catch(e){
+    showToast(t("toastNetworkError"));
+    return false;
+  } finally {
+    client.busy = false;
+    render();
+  }
+}
+async function pollOnce(){
+  if (!client.roomCode || client.busy) return;
+  var r = await loadRoom(client.roomCode);
+  if (!r) return;
+  var changed = !client.room || r.version !== client.room.version;
+  client.room = r;
+  if (changed) render();
+}
+function startPolling(){
+  if (client.pollTimer) clearInterval(client.pollTimer);
+  client.pollTimer = setInterval(pollOnce, 2500);
+}
+
+window.pjSetLang = function(lang){ client.lang = lang; render(); };
+
+window.pjCreateRoom = async function(){
+  var name = (client.homeNameDraft || "").trim();
+  if (!name){ showToast(t("toastEnterName")); return; }
+  var code = genRoomCode();
+  var state = freshRoomState(code, name);
+  await saveRoom(code, state);
+  client.myName = name; client.roomCode = code; client.room = state;
+  startPolling(); render();
+};
+
+window.pjJoinRoom = async function(){
+  var code = (client.joinCodeDraft || "").trim().toUpperCase();
+  var name = (client.joinNameDraft || "").trim();
+  if (!code || !name){ showToast(t("toastEnterCodeName")); return; }
+  var room = await loadRoom(code);
+  if (!room){ showToast(t("toastTableNotFound")); return; }
+  if (room.players.indexOf(name) !== -1){
+    client.myName = name; client.roomCode = code; client.room = room;
+    startPolling(); render(); return;
+  }
+  if (room.phase !== "lobby"){ showToast(t("toastGameStarted")); return; }
+  if (room.players.length >= MAX_PLAYERS){ showToast(t("toastTableFull")); return; }
+  room.players.push(name);
+  room.scores[name] = 0;
+  pushLog(room, "log_playerJoined", { name: name });
+  room.version += 1;
+  await saveRoom(code, room);
+  client.myName = name; client.roomCode = code; client.room = room;
+  startPolling(); render();
+};
+
+window.pjLeaveTable = function(){
+  if (client.pollTimer) clearInterval(client.pollTimer);
+  client.myName = null; client.roomCode = null; client.room = null; client.selectedCard = null;
+  render();
+};
+window.pjStartHand = function(){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    if (s.players.length < MIN_PLAYERS) throw new Error("need-2");
+    startHand(s); return s;
+  });
+};
+window.pjBid = function(amount){ mutate(function(s){ placeBid(s, client.myName, amount); return s; }); };
+window.pjChooseTrump = function(suit){ mutate(function(s){ chooseTrump(s, client.myName, suit); return s; }); };
+window.pjSelectCard = function(card){
+  var room = client.room;
+  if (!room || room.phase !== "playing") return;
+  if (room.players[room.turnIndex] !== client.myName) return;
+  var legal = legalCards(room.hands[client.myName], room.currentTrick);
+  if (legal.indexOf(card) === -1) return;
+  client.selectedCard = (client.selectedCard === card) ? null : card;
+  render();
+};
+window.pjConfirmPlay = function(){
+  if (!client.selectedCard) return;
+  var card = client.selectedCard;
+  mutate(function(s){ playCard(s, client.myName, card); return s; }, { selectClear: true });
+};
+window.pjNextHand = function(){
+  mutate(function(s){ if (s.phase !== "handSummary") return false; startHand(s); return s; });
+};
+window.pjNewGame = function(){
+  mutate(function(s){
+    if (s.phase !== "gameOver") return false;
+    s.players.forEach(function(p){ s.scores[p] = 0; });
+    s.dealerIndex = -1; s.handNumber = 0; s.winner = null;
+    pushLog(s, "log_newGame", {});
+    startHand(s); return s;
+  });
+};
+window.pjSetTarget = function(val){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    var v = parseInt(val, 10);
+    if (!v || v < 5 || v > 200) throw new Error("invalid-target");
+    s.targetScore = v; return s;
+  }).then(function(ok){ if (ok) showToast(t("toastTargetSaved")); });
+};
+window.pjSetDealer = function(name){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    if (s.players.indexOf(name) === -1) return false;
+    s.chosenDealer = name; return s;
+  });
+};
+window.pjToggleRules = function(){ client.showRules = !client.showRules; render(); };
+window.pjToggleLedger = function(){ client.ledgerOpen = !client.ledgerOpen; render(); };
+window.pjTogglePoints = function(){ client.pointsOpen = !client.pointsOpen; render(); };
+window.pjCopyCode = function(){
+  try { navigator.clipboard.writeText(client.roomCode); showToast(t("toastCodeCopied",{code:client.roomCode})); }
+  catch(e){ showToast(t("toastCode",{code:client.roomCode})); }
+};
+window.pjDraft = function(field, val){ client[field] = val; };
+
+// ============================== RENDER ==============================
+function handStripHtml(r, interactive){
+  var myHand = r.hands[client.myName] || [];
+  if (!myHand.length) return "";
+  var isMyTurn = interactive && r.players[r.turnIndex] === client.myName;
+  var legal = isMyTurn ? legalCards(myHand, r.currentTrick) : [];
+  var handRow = myHand.map(function(c){
+    var playable = isMyTurn && legal.indexOf(c) !== -1;
+    return cardEl(c, {
+      playable: playable,
+      unplayable: isMyTurn && legal.indexOf(c) === -1,
+      selected: client.selectedCard === c,
+      onclick: playable ? ("pjSelectCard('" + c + "')") : ""
+    });
+  }).join("");
+  return '<div class="pj-hand-wrap">'
+    + '<div class="pj-hand-row">' + handRow + "</div>"
+    + (interactive && client.selectedCard ? '<div style="text-align:center;margin-top:10px;"><button class="btn-primary" onclick="pjConfirmPlay()">' + esc(t("playBtn",{card: rankOf(client.selectedCard)+SUIT_SYMBOL[suitOf(client.selectedCard)]})) + "</button></div>" : "")
+  + "</div>";
+}
+function cardEl(card, opts){
+  opts = opts || {};
+  var cls = ["pj-card"];
+  if (isRed(card)) cls.push("red");
+  if (opts.mini) cls.push("mini");
+  if (opts.playable) cls.push("playable");
+  if (opts.unplayable) cls.push("unplayable");
+  if (opts.selected) cls.push("selected");
+  var onclick = opts.onclick ? ('onclick="' + opts.onclick + '"') : "";
+  return '<div class="' + cls.join(" ") + '" ' + onclick + '>'
+    + "<div>" + esc(rankOf(card)) + "</div>"
+    + '<div class="suit">' + SUIT_SYMBOL[suitOf(card)] + "</div>"
+    + "</div>";
+}
+function langToggleHtml(){
+  return '<div class="pj-lang-toggle">'
+    + '<button class="lang-btn ' + (client.lang==="fr"?"active":"") + '" onclick="pjSetLang(\'fr\')">FR</button>'
+    + '<button class="lang-btn ' + (client.lang==="en"?"active":"") + '" onclick="pjSetLang(\'en\')">EN</button>'
+    + "</div>";
+}
+function rulesBox(target){
+  var dict = STR[client.lang] || STR.fr;
+  return '<div class="pj-rules-box">' + dict.rulesHtml.split("{target}").join(target) + "</div>";
+}
+function renderHome(){
+  document.getElementById("pj-tagline").textContent = t("tagline");
+  document.getElementById("pj-topbar-right").innerHTML = langToggleHtml();
+  var app = document.getElementById("pj-app");
+  app.innerHTML =
+    '<div class="pj-center">'
+      + '<div class="pj-card-suit-row" style="text-align:center;">\u2660 \u2665 \u2666 \u2663</div>'
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("createTableTitle")) + "</h3>"
+        + '<label class="pj-field-label">' + esc(t("yourName")) + "</label>"
+        + '<input type="text" placeholder="Ben" value="' + esc(client.homeNameDraft||"") + '" oninput="pjDraft(\'homeNameDraft\', this.value)" maxlength="18" />'
+        + '<div style="height:12px"></div>'
+        + '<button class="btn-primary" style="width:100%" onclick="pjCreateRoom()">' + esc(t("createTableBtn")) + "</button>"
+      + "</div>"
+      + '<div class="pj-divider-word">' + esc(t("orWord")) + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("joinTableTitle")) + "</h3>"
+        + '<label class="pj-field-label">' + esc(t("tableCode")) + "</label>"
+        + '<input type="text" placeholder="ABCD" style="text-transform:uppercase" value="' + esc(client.joinCodeDraft||"") + '" oninput="pjDraft(\'joinCodeDraft\', this.value)" maxlength="4" />'
+        + '<div style="height:10px"></div>'
+        + '<label class="pj-field-label">' + esc(t("yourName")) + "</label>"
+        + '<input type="text" placeholder="Triska" value="' + esc(client.joinNameDraft||"") + '" oninput="pjDraft(\'joinNameDraft\', this.value)" maxlength="18" />'
+        + '<div style="height:12px"></div>'
+        + '<button class="btn-primary" style="width:100%" onclick="pjJoinRoom()">' + esc(t("joinBtn")) + "</button>"
+      + "</div>"
+      + '<div class="pj-rules-toggle"><a onclick="pjToggleRules()">' + esc(client.showRules?t("hideRules"):t("showRules")) + "</a></div>"
+      + (client.showRules ? '<div class="pj-panel">' + rulesBox(DEFAULT_TARGET) + "</div>" : "")
+    + "</div>";
+}
+function renderTopbarRoom(){
+  var r = client.room;
+  document.getElementById("pj-tagline").textContent = "";
+  document.getElementById("pj-topbar-right").innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;">'
+    + langToggleHtml()
+    + '<span class="pj-room-chip" onclick="pjCopyCode()" title="Copy">' + esc(r.code) + "</span>"
+    + '<button class="btn-small" onclick="pjLeaveTable()">' + esc(t("leaveBtn")) + "</button>"
+    + "</div>";
+}
+function renderLobby(){
+  var r = client.room;
+  renderTopbarRoom();
+  var isHost = r.players[0] === client.myName;
+  var app = document.getElementById("pj-app");
+  var seats = "";
+  for (var i=0;i<MAX_PLAYERS;i++){
+    if (r.players[i]){
+      seats += "<li><span class=\"pj-seat-num\">" + (i+1) + "</span>" + esc(r.players[i])
+        + (r.players[i]===client.myName ? ' <span style="color:var(--brass-bright);font-size:12px;">' + esc(t("youTag")) + "</span>" : "")
+        + (i===0 ? ' <span style="color:var(--text-dim);font-size:11px;">\u2014 ' + esc(t("host")) + "</span>" : "")
+        + "</li>";
+    } else {
+      seats += '<li><span class="pj-seat-num">' + (i+1) + '</span><span class="pj-seat-empty">' + esc(t("emptySeat")) + "</span></li>";
+    }
+  }
+  app.innerHTML =
+    '<div class="pj-center">'
+      + '<div class="pj-lobby-code">'
+        + '<div class="hint">' + esc(t("shareCodeHint")) + "</div>"
+        + '<div class="code">' + esc(r.code) + "</div>"
+      + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("playersTitle")) + " (" + r.players.length + "/" + MAX_PLAYERS + ")</h3>"
+        + '<ul class="pj-seat-list">' + seats + "</ul>"
+      + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("firstDealerTitle")) + "</h3>"
+        + (isHost
+            ? '<select class="pj-select" onchange="pjSetDealer(this.value)">' + r.players.map(function(p){ return '<option value="' + esc(p) + '" ' + (p===r.chosenDealer?"selected":"") + '>' + esc(p) + '</option>'; }).join("") + "</select>"
+            : '<p style="color:var(--text-dim);font-size:14px;">' + esc(r.chosenDealer) + "</p>")
+      + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("targetScoreTitle")) + "</h3>"
+        + '<div class="pj-row"><input type="text" inputmode="numeric" id="pj-target-input" value="' + r.targetScore + '" ' + (isHost?"":"disabled") + " />"
+        + (isHost ? '<button class="btn-small" onclick="pjSetTarget(document.getElementById(\'pj-target-input\').value)">' + esc(t("validateBtn")) + "</button>" : "")
+        + "</div>"
+      + "</div>"
+      + '<button class="btn-primary" style="width:100%" ' + (r.players.length<MIN_PLAYERS?"disabled":"") + ' onclick="pjStartHand()">'
+        + esc(r.players.length<MIN_PLAYERS ? t("waitingPlayers") : t("dealStartBtn"))
+      + "</button>"
+      + '<div class="pj-rules-toggle"><a onclick="pjToggleRules()">' + esc(client.showRules?t("hideRules"):t("showRules")) + "</a></div>"
+      + (client.showRules ? '<div class="pj-panel">' + rulesBox(r.targetScore) + "</div>" : "")
+    + "</div>";
+}
+function ledgerHtml(){
+  var r = client.room;
+  return '<div class="pj-ledger">'
+    + "<h3>" + esc(t("ledgerTitle")) + "</h3>"
+    + '<table><thead><tr><th class="name-col">' + esc(t("playerCol")) + "</th><th>" + esc(t("scoreCol")) + "</th></tr></thead><tbody>"
+    + r.players.map(function(p){ return '<tr><td class="name-col">' + esc(p) + (p===client.myName?" \u2022":"") + "</td><td>" + r.scores[p] + "</td></tr>"; }).join("")
+    + "</tbody></table>"
+    + '<div style="text-align:center;margin-top:8px;color:#555;font-size:11px;">' + esc(t("ledgerFooter", {target: r.targetScore, hand: r.handNumber})) + "</div>"
+    + "</div>";
+}
+function livePointsHtml(r){
+  var points = computePointsSnapshot(r.trickLog, r.players, r.trump, false, r.pitcher);
+  var rows = points.map(function(pt){
+    return '<div class="pt-row"><span class="label">' + esc(pointLabel(pt)) + '</span><span class="who">' + (pt.winner ? esc(pt.winner) : "\u2014") + ' <span style="opacity:.6">(' + esc(livePointDetail(pt)) + ")</span></span></div>";
+  }).join("");
+  return '<div class="pj-panel">'
+    + '<h3 class="disp">' + esc(t("livePointsTitle")) + "</h3>"
+    + '<div class="pj-summary-points">' + rows + "</div>"
+    + "</div>";
+}
+function pointDetail(pt){
+  if (pt.kind === "card"){
+    return pt.card ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : "\u2014";
+  }
+  if (pt.kind === "jack") return pt.winner ? t("jackDetail") : t("notDealt");
+  if (pt.kind === "pidjou") return pt.winner ? t("pidjouDetail") : t("notDealt");
+  if (pt.kind === "game") return pt.tie ? t("gameTieDetail", {n: pt.total}) : t("cardPointsSuffix", {n: pt.total});
+  return "";
+}
+function livePointDetail(pt){
+  if (pt.kind === "card") return pt.card ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("liveNotYet");
+  if (pt.kind === "jack") return pt.winner ? t("jackDetail") : t("liveNotYet");
+  if (pt.kind === "pidjou") return pt.winner ? t("pidjouDetail") : t("liveNotYet");
+  if (pt.kind === "game"){
+    if (pt.winner) return t("cardPointsSuffix", {n: pt.total});
+    if (pt.tie && pt.total > 0) return t("liveGameTie", {n: pt.total});
+    return t("liveNotYet");
+  }
+  return "";
+}
+function pointLabel(pt){
+  return pt.label + (pt.value > 1 ? (" (" + pt.value + ")") : "");
+}
+function logLine(entry){
+  return t(entry.key, entry.params);
+}
+function renderTable(){
+  var r = client.room;
+  renderTopbarRoom();
+  var app = document.getElementById("pj-app");
+  var n = r.players.length;
+  var dealer = r.players[r.dealerIndex];
+
+  var chips = r.players.map(function(p){
+    var cls = ["pj-player-chip"];
+    if (p === client.myName) cls.push("is-me");
+    var turnPlayer = null;
+    if (r.phase === "bidding") turnPlayer = r.bidding.order[r.bidding.turnPtr];
+    if (r.phase === "chooseTrump") turnPlayer = r.pitcher;
+    if (r.phase === "playing") turnPlayer = r.players[r.turnIndex];
+    if (turnPlayer === p) cls.push("is-turn");
+    var cardCount = r.hands[p] ? r.hands[p].length : 0;
+    var tag = "";
+    if (p === dealer) tag = '<span class="tag">' + esc(t("dealerTag")) + "</span>";
+    if (p === r.pitcher) tag = '<span class="tag">' + esc(t("pitcherTag")) + "</span>";
+    var meta = cardsLabel(cardCount);
+    if (r.phase === "bidding"){
+      var bid = r.bidding.bids[p];
+      meta = bid === undefined ? t("waitingWord") : (bid === "pass" ? t("passWord") : t("bidWord",{n:bid}));
+    }
+    return '<div class="' + cls.join(" ") + '">' + tag + '<div class="name">' + esc(p) + '</div><div class="meta">' + esc(meta) + "</div></div>";
+  }).join("");
+
+  var feltInner = "";
+  if (r.phase === "bidding"){
+    var turnPlayer2 = r.bidding.order[r.bidding.turnPtr];
+    var mine = turnPlayer2 === client.myName;
+    feltInner = '<div class="pj-status-line ' + (mine?"mine":"") + '">' + esc(mine ? t("yourTurnBid") : t("thinkingBid",{player:turnPlayer2})) + "</div>";
+  } else if (r.phase === "chooseTrump"){
+    var mineT = r.pitcher === client.myName;
+    feltInner = '<div class="pj-status-line ' + (mineT?"mine":"") + '">' + esc(mineT ? t("yourTurnTrump") : t("thinkingTrump",{player:r.pitcher})) + "</div>";
+  } else if (r.phase === "playing"){
+    var trickCards = r.currentTrick.map(function(c){ return '<div class="pj-trick-card"><div class="who">' + esc(c.player) + "</div>" + cardEl(c.card,{mini:true}) + "</div>"; }).join("");
+    var turnPlayer3 = r.players[r.turnIndex];
+    var mine2 = turnPlayer3 === client.myName;
+    var trumpBadge = r.trump ? '<div class="pj-trump-badge">' + esc(t("trumpBadge",{suit: suitFullLabel(r.trump)})) + "</div>" : '<div class="pj-trump-badge">' + esc(t("trumpWillBeChosen",{pitcher:r.pitcher})) + "</div>";
+    var statusLine = '<div class="pj-status-line ' + (mine2?"mine":"") + '">' + esc(mine2 ? t("yourTurnPlay") : t("playingNow",{player:turnPlayer3})) + "</div>";
+    var lastTrickHtml = "";
+    if (r.lastTrick){
+      var reasonKey = r.lastTrick.wonByTrump ? "wonByTrump" : "wonByLedSuit";
+      lastTrickHtml = '<div class="pj-last-trick">'
+        + '<span class="pj-last-trick-label">' + esc(t("lastTrickLabel")) + "</span> "
+        + '<b>' + esc(r.lastTrick.winner) + '</b> '
+        + esc(t(reasonKey, {card: rankOf(r.lastTrick.card)+SUIT_SYMBOL[suitOf(r.lastTrick.card)]}))
+      + "</div>";
+    }
+    feltInner = trumpBadge + '<div class="pj-trick-area">' + (trickCards || '<span style="color:var(--text-dim);font-size:13px;">' + esc(t("trickPending")) + "</span>") + "</div>" + lastTrickHtml + statusLine;
+  } else if (r.phase === "handSummary"){
+    feltInner = '<div class="pj-status-line">' + esc(t("handResultTitle")) + "</div>";
+  } else if (r.phase === "gameOver"){
+    feltInner = '<div class="pj-status-line">' + esc(t("winnerBanner",{winner:""})) + "</div>";
+  }
+
+  var bottomPanel = "";
+  if (r.phase === "bidding"){
+    var turnPlayer4 = r.bidding.order[r.bidding.turnPtr];
+    if (turnPlayer4 === client.myName){
+      var isFinalWrapTurn = client.myName === r.bidding.firstBidder;
+      var min = r.bidding.highest.amount + 1;
+      var bidBtns = "";
+      for (var a=min; a<=MAX_BID; a++){ bidBtns += '<button class="bid-btn" onclick="pjBid(' + a + ')">' + a + "</button>"; }
+      bottomPanel = '<div class="pj-panel pj-bid-panel">'
+        + '<h3 class="disp">' + esc(t("yourBidTitle")) + "</h3>"
+        + '<p style="color:var(--text-dim);font-size:13px;">' + esc(t("currentBid",{amount:r.bidding.highest.amount, player:r.bidding.highest.player})) + "</p>"
+        + '<div class="pj-bid-options">' + bidBtns + "</div>"
+        + '<div style="height:10px"></div>'
+        + '<button class="btn-ghost" onclick="pjBid(\'pass\')">' + esc(isFinalWrapTurn ? t("keepBidBtn",{amount:1}) : t("passBtn")) + "</button>"
+      + "</div>";
+    } else {
+      bottomPanel = '<div class="pj-panel" style="text-align:center;color:var(--text-dim);">' + esc(t("thinkingBid",{player:turnPlayer4})) + "</div>";
+    }
+  }
+  if (r.phase === "chooseTrump"){
+    if (r.pitcher === client.myName){
+      var suitBtns = SUITS.map(function(s){
+        var red = RED_SUITS.indexOf(s) !== -1;
+        return '<button class="bid-btn" style="width:60px;height:60px;font-size:26px;' + (red?'color:var(--rust);':'') + '" onclick="pjChooseTrump(\'' + s + '\')">' + SUIT_SYMBOL[s] + "</button>";
+      }).join("");
+      bottomPanel = '<div class="pj-panel pj-bid-panel">'
+        + '<h3 class="disp">' + esc(t("chooseTrumpTitle")) + "</h3>"
+        + '<p style="color:var(--text-dim);font-size:13px;">' + esc(t("chooseTrumpHint")) + "</p>"
+        + '<div class="pj-bid-options">' + suitBtns + "</div>"
+      + "</div>";
+    } else {
+      bottomPanel = '<div class="pj-panel" style="text-align:center;color:var(--text-dim);">' + esc(t("thinkingTrump",{player:r.pitcher})) + "</div>";
+    }
+  }
+  if (r.phase === "bidding" || r.phase === "chooseTrump"){
+    bottomPanel += handStripHtml(r, false);
+  }
+  if (r.phase === "playing"){
+    bottomPanel = handStripHtml(r, true);
+  }
+  if (r.phase === "handSummary"){
+    var s = r.lastHandSummary;
+    var ptsHtml = s.points.map(function(pt){
+      return '<div class="pt-row"><span class="label">' + esc(pointLabel(pt)) + '</span><span class="who">' + (pt.winner ? esc(pt.winner) : "\u2014") + ' <span style="opacity:.6">(' + esc(pointDetail(pt)) + ")</span></span></div>";
+    }).join("");
+    var deltaRows = r.players.map(function(p){
+      var d = s.deltas[p];
+      var sign = d > 0 ? ("+" + d) : String(d);
+      var color = d > 0 ? "#7fbf7f" : (d < 0 ? "var(--rust)" : "var(--text-dim)");
+      return '<div class="pt-row"><span>' + esc(p) + (p===s.pitcher ? (' <span style="font-size:11px;color:var(--brass-bright);">' + esc(t("pitcherNote",{bid:s.bid})) + "</span>") : "") + '</span><span style="color:' + color + ';font-weight:700;">' + sign + "</span></div>";
+    }).join("");
+    bottomPanel = '<div class="pj-panel">'
+      + '<h3 class="disp">' + esc(t("handResultTitle")) + "</h3>"
+      + '<p style="font-size:13.5px;color:var(--text-dim);">' + esc(s.made ? t("madeContract",{pitcher:s.pitcher}) : t("failedContract",{pitcher:s.pitcher, bid:s.bid})) + "</p>"
+      + '<div class="pj-summary-points">' + ptsHtml + "</div>"
+      + '<div class="pj-divider-word">' + esc(t("scoresDivider")) + "</div>"
+      + '<div class="pj-summary-points">' + deltaRows + "</div>"
+      + '<button class="btn-primary" style="width:100%;margin-top:10px;" onclick="pjNextHand()">' + esc(t("nextHandBtn")) + "</button>"
+    + "</div>";
+  }
+  if (r.phase === "gameOver"){
+    bottomPanel = '<div class="pj-winner-banner">'
+      + '<div class="crown">\ud83c\udfc6</div>'
+      + '<h2 class="disp">' + esc(t("winnerBanner",{winner:r.winner})) + "</h2>"
+      + '<p style="color:var(--text-dim);">' + esc(t("withPoints",{n:r.scores[r.winner]})) + "</p>"
+      + '<button class="btn-primary" style="margin-top:16px;" onclick="pjNewGame()">' + esc(t("newGameBtn")) + "</button>"
+    + "</div>";
+  }
+
+  var logHtml = '<div class="pj-log">' + r.log.slice(-12).map(function(l){ return esc(logLine(l)); }).join("<br/>") + "</div>";
+
+  app.innerHTML =
+    '<div class="pj-table-wrap">'
+      + '<div class="pj-players-strip">' + chips + "</div>"
+      + '<div class="pj-felt">' + feltInner + "</div>"
+      + bottomPanel
+      + ((r.phase === "playing" || r.phase === "handSummary") ? ('<div style="text-align:center;margin:10px 0 0;"><a style="color:var(--text-dim);font-size:12.5px;cursor:pointer;text-decoration:underline;" onclick="pjTogglePoints()">' + esc(client.pointsOpen?t("hideLivePoints"):t("showLivePoints")) + "</a></div>") : "")
+      + (client.pointsOpen && (r.phase === "playing" || r.phase === "handSummary") ? livePointsHtml(r) : "")
+      + '<div style="text-align:center;margin:14px 0 6px;"><a style="color:var(--text-dim);font-size:12.5px;cursor:pointer;text-decoration:underline;" onclick="pjToggleLedger()">' + esc(client.ledgerOpen?t("hideLedger"):t("showLedger")) + "</a></div>"
+      + (client.ledgerOpen ? ledgerHtml() : "")
+      + logHtml
+    + "</div>";
+}
+function render(){
+  if (!STORAGE_CONFIGURED){
+    document.getElementById("pj-topbar-right").innerHTML = "";
+    document.getElementById("pj-app").innerHTML =
+      '<div class="pj-center"><div class="pj-panel" style="border-color:var(--rust);">'
+      + '<h3 class="disp" style="color:var(--rust);">Configuration requise</h3>'
+      + '<p style="font-size:14px;line-height:1.6;color:var(--text-light);">Ce fichier n\'est pas encore reli\u00e9 \u00e0 une base de donn\u00e9es. Ouvre le fichier <code>pidjou.html</code>, cherche la ligne <code>FIREBASE_DB_URL</code> tout en haut du script, et remplace-la par ton URL Firebase (voir les instructions fournies).</p>'
+      + '</div></div>';
+    return;
+  }
+  if (!client.room) renderHome();
+  else if (client.room.phase === "lobby") renderLobby();
+  else renderTable();
+}
+render();
+})();
+</script>
+</body>
+</html>
