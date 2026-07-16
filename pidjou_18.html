@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Pidjou</title>
+<style>
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+*, *::before, *::after { -webkit-tap-highlight-color: transparent; }
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+#pidjou-root, #pidjou-root * { box-sizing: border-box; }
+#pidjou-root {
+  --felt-dark: #052e14;
+  --felt: #0a5c28;
+  --felt-light: #0f7d36;
+  --flag-blue: #002674;
+  --flag-blue-light: #2350a8;
+  --ink: #051339;
+  --parchment: #f2ecc9;
+  --parchment-dim: #e6dba0;
+  --brass: #fcd022;
+  --brass-bright: #ffe066;
+  --rust: #a6432e;
+  --text-light: #f5f0da;
+  --text-dim: #b8c9bb;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-light);
+  background: radial-gradient(ellipse at top, var(--felt-light), var(--felt-dark) 70%);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+#pidjou-root .disp { font-family: 'Fraunces', serif; }
+#pidjou-root .mono { font-family: 'Space Mono', monospace; }
+
+#pidjou-root button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+}
+#pidjou-root button:active { transform: translateY(1px); }
+#pidjou-root button:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+#pidjou-root button.btn-primary {
+  background: linear-gradient(180deg, var(--brass-bright), var(--brass));
+  color: #2a1c05;
+  font-weight: 700;
+  padding: 12px 22px;
+  font-size: 15px;
+  box-shadow: 0 2px 0 #8a6825, 0 6px 14px rgba(0,0,0,.35);
+}
+#pidjou-root button.btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+#pidjou-root button.btn-ghost {
+  background: transparent;
+  color: var(--text-light);
+  border: 1px solid rgba(242,232,208,.35);
+  padding: 10px 18px;
+  font-size: 14px;
+}
+#pidjou-root button.btn-ghost:hover:not(:disabled) { background: rgba(242,232,208,.08); }
+#pidjou-root button.btn-small {
+  padding: 7px 12px;
+  font-size: 13px;
+  background: rgba(242,232,208,.12);
+  color: var(--text-light);
+  border: 1px solid rgba(242,232,208,.25);
+}
+#pidjou-root button.btn-small:hover:not(:disabled) { background: rgba(242,232,208,.2); }
+#pidjou-root button.lang-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: rgba(242,232,208,.08);
+  color: var(--text-dim);
+  border: 1px solid rgba(242,232,208,.2);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: .5px;
+}
+#pidjou-root button.lang-btn.active {
+  background: var(--brass);
+  color: #2a1c05;
+  border-color: var(--brass);
+  font-weight: 700;
+}
+#pidjou-root button.bid-btn {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 17px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 3px 0 #a89568;
+}
+#pidjou-root button.bid-btn:hover:not(:disabled) { filter: brightness(1.05); }
+#pidjou-root input[type=text] {
+  font-family: 'Space Mono', monospace;
+  background: rgba(242,232,208,.1);
+  border: 1px solid rgba(242,232,208,.35);
+  color: var(--text-light);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  width: 100%;
+}
+#pidjou-root input[type=text]::placeholder { color: rgba(242,232,208,.4); }
+#pidjou-root input[type=text]:focus, #pidjou-root button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 2px;
+}
+
+.pj-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0,38,116,.5);
+  background: linear-gradient(180deg, rgba(0,38,116,.35), rgba(0,0,0,.15));
+  gap: 10px; flex-wrap: wrap;
+}
+.pj-brand { font-family: 'Fraunces', serif; font-weight: 700; font-size: 20px; letter-spacing: .5px; color: var(--brass-bright); }
+.pj-brand span { color: var(--text-dim); font-family: 'Inter'; font-weight: 500; font-size: 12px; display:block; letter-spacing: 1.5px; text-transform: uppercase; margin-top: -2px;}
+.pj-help-btn {
+  width: 30px; height: 30px; border-radius: 50%; padding: 0;
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pj-room-chip {
+  font-family: 'Space Mono', monospace;
+  background: rgba(35,80,168,.15);
+  border: 1px dashed var(--flag-blue-light);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+.pj-lang-toggle { display: flex; gap: 4px; align-items: center; }
+.flag-btn {
+  padding: 0; width: 30px; height: 22px;
+  background: transparent; border: 1px solid rgba(242,232,208,.25);
+  border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  margin-right: 2px;
+}
+.flag-btn:hover { border-color: var(--brass-bright); transform: scale(1.05); }
+.flag-btn { position: relative; }
+.flag-btn-playing { border-color: var(--brass-bright); box-shadow: 0 0 0 2px rgba(255,224,102,.4); }
+.flag-btn-stop {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.55); color: var(--brass-bright); font-size: 10px;
+}
+
+.pj-center { max-width: 560px; margin: 0 auto; padding: 18px 20px 48px; }
+.pj-home-hero { text-align: center; margin-bottom: 34px; }
+.pj-home-hero h1 { font-size: 46px; margin: 0 0 6px; letter-spacing: .5px; }
+.pj-home-hero p { color: var(--text-dim); font-size: 15px; line-height: 1.5; max-width: 380px; margin: 0 auto; }
+.pj-card-suit-row { font-size: 22px; letter-spacing: 10px; margin: 0 0 16px; opacity: .8; }
+
+.pj-panel {
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(242,232,208,.14);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.pj-panel h3 { font-family: 'Fraunces', serif; margin: 0 0 14px; font-size: 17px; font-weight: 600; color: var(--brass-bright); }
+.pj-field-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 6px; display: block; }
+.pj-row { display: flex; gap: 10px; }
+.pj-row > * { flex: 1; }
+.pj-select {
+  font-family: 'Inter', sans-serif;
+  background: rgba(242,232,208,.1);
+  border: 1px solid rgba(242,232,208,.35);
+  color: var(--text-light);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+.pj-select option { background: var(--felt-dark); color: var(--text-light); }
+.pj-divider-word {
+  text-align: center; color: var(--text-dim); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  margin: 26px 0; position: relative;
+}
+.pj-divider-word:before, .pj-divider-word:after {
+  content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(242,232,208,.15);
+}
+.pj-divider-word:before { left: 0; } .pj-divider-word:after { right: 0; }
+.pj-mode-heading {
+  font-family: 'Fraunces', serif; font-size: 13px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--brass-bright); text-align: center; margin: 8px 0 14px;
+}
+.pj-mode-divider { height: 2px; background: linear-gradient(90deg, transparent, var(--flag-blue-light), transparent); margin: 38px 0 22px; }
+
+.pj-lobby-code { text-align: center; margin: 6px 0 26px; }
+.pj-lobby-code .code { font-family: 'Space Mono', monospace; font-size: 40px; letter-spacing: 12px; color: var(--brass-bright); font-weight: 700; }
+.pj-lobby-code .hint { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
+.pj-seat-list { list-style: none; margin: 0; padding: 0; }
+.pj-seat-list li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 4px; border-bottom: 1px solid rgba(242,232,208,.08);
+  font-size: 15px;
+}
+.pj-seat-list li:last-child { border-bottom: none; }
+.pj-seat-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--felt-light); border: 1px solid var(--brass);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-family: 'Space Mono'; color: var(--brass-bright);
+  flex-shrink: 0;
+}
+.pj-seat-empty { color: var(--text-dim); font-style: italic; font-size: 14px; }
+.pj-bot-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: rgba(35,80,168,.2); border: 1px solid var(--flag-blue-light);
+  color: var(--text-light); font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 4px;
+}
+.pj-bot-remove { color: var(--rust); cursor: pointer; margin-left: 8px; font-size: 13px; text-decoration: none; }
+.pj-seat-addbot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pj-add-bot-label { color: var(--text-dim); font-size: 13px; font-style: italic; }
+.pj-add-bot-btns { display: flex; gap: 6px; margin-left: auto; }
+.pj-add-bot-btns button { font-size: 11px; padding: 5px 9px; }
+
+.pj-table-wrap { max-width: 780px; margin: 0 auto; padding: 16px 14px 90px; }
+.pj-players-strip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px; flex: 1 1 auto; min-width: 0; }
+.pj-top-row { display: flex; align-items: flex-start; gap: 8px; }
+.pj-target-line {
+  text-align: center; font-size: 11px; color: var(--text-dim); letter-spacing: .5px;
+  padding: 2px 0 8px; text-transform: uppercase;
+}
+.pj-trump-corner {
+  flex: 0 0 auto; margin-top: 4px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,.3); border: 1px solid var(--brass);
+  padding: 6px 12px; border-radius: 20px; font-size: 12.5px; color: var(--brass-bright);
+  white-space: nowrap;
+}
+.pj-trump-corner-pending { border-color: rgba(242,232,208,.3); color: var(--text-dim); }
+.pj-player-chip {
+  flex: 0 0 auto;
+  background: rgba(0,0,0,.22); border: 1px solid rgba(242,232,208,.15);
+  border-radius: 10px; padding: 8px 12px; min-width: 92px;
+  text-align: center; position: relative;
+}
+.pj-player-chip.is-turn { border-color: var(--brass-bright); box-shadow: 0 0 0 1px var(--brass-bright), 0 0 14px rgba(201,154,62,.35); }
+.pj-player-chip.is-me { background: rgba(201,154,62,.12); }
+.pj-player-chip .name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+.pj-player-chip .meta { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+.pj-player-chip .score { font-size: 11px; color: var(--brass-bright); margin-top: 2px; font-family: 'Space Mono', monospace; font-weight: 700; display: inline-block; }
+.pj-player-chip .score.pulse { animation: scorePulse .7s ease; }
+@keyframes scorePulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.5); color: #7fbf7f; }
+  100% { transform: scale(1); }
+}
+.pj-player-chip .tag { position: absolute; top: -8px; right: 6px; font-size: 9px; background: var(--brass); color: #2a1c05; padding: 1px 6px; border-radius: 8px; font-weight: 700; letter-spacing: .5px; }
+
+.pj-felt {
+  background: radial-gradient(ellipse at center, var(--felt-light), var(--felt) 75%);
+  border: 6px solid #0a1e15;
+  border-radius: 18px;
+  box-shadow: inset 0 0 40px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  padding: 26px 16px;
+  min-height: 190px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.pj-trick-area { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 78px; align-items: center;}
+.pj-trick-card { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pj-trick-card .who { font-size: 10px; color: var(--text-dim); letter-spacing: .5px; }
+.pj-trick-card-winner .pj-card { box-shadow: 0 3px 6px rgba(0,0,0,.4), 0 0 0 2px var(--brass-bright); }
+.pj-trick-card-winner .who { color: var(--brass-bright); font-weight: 700; }
+.pj-status-line { font-family: 'Fraunces', serif; font-size: 16px; text-align: center; color: var(--parchment); }
+.pj-status-line.mine { color: var(--brass-bright); font-weight: 700; }
+.pj-trump-announce {
+  font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; text-align: center;
+  color: var(--brass-bright); padding: 18px 10px 6px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+.pj-exchange-summary {
+  text-align: center; font-size: 12.5px; color: var(--text-light); opacity: .85;
+  padding-bottom: 10px; line-height: 1.7;
+}
+.pj-last-trick {
+  font-size: 12.5px; color: var(--text-dim); text-align: center;
+  background: rgba(0,0,0,.22); border: 1px solid rgba(242,232,208,.15);
+  padding: 10px 14px; border-radius: 12px; max-width: 100%;
+}
+.pj-last-trick b { color: var(--brass-bright); }
+.pj-last-trick-label { text-transform: uppercase; letter-spacing: .5px; font-size: 10px; opacity: .7; margin-bottom: 4px; }
+.pj-trump-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,.3); border: 1px solid var(--brass);
+  padding: 4px 12px; border-radius: 20px; font-size: 13px; color: var(--brass-bright);
+}
+
+.pj-card {
+  width: 54px; height: 76px;
+  background: var(--parchment);
+  border-radius: 7px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.4);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px;
+  color: var(--ink); position: relative; flex-shrink: 0;
+}
+.pj-card.red { color: var(--rust); }
+.pj-card .suit { font-size: 20px; margin-top: 2px; }
+.pj-card.mini { width: 40px; height: 56px; font-size: 14px; }
+.pj-card.mini .suit { font-size: 14px; }
+.pj-card.playable { cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,.4), 0 0 0 2px var(--brass-bright); }
+.pj-card.playable:hover { transform: translateY(-6px); }
+.pj-card.unplayable { opacity: .4; cursor: not-allowed; }
+.pj-card.selected { transform: translateY(-10px); box-shadow: 0 6px 12px rgba(0,0,0,.5), 0 0 0 2px var(--brass-bright); }
+
+.pj-hand-wrap {
+  position: sticky; bottom: 0;
+  background: linear-gradient(180deg, transparent, rgba(6,16,11,.92) 30%);
+  padding: 18px 4px 10px;
+  margin: 0 -14px;
+}
+.pj-hand-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 0 10px; }
+
+.pj-bid-panel { text-align: center; }
+.pj-bid-options { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+
+.pj-log {
+  font-size: 12.5px; color: var(--text-dim); max-height: 90px; overflow-y: auto;
+  border-top: 1px dashed rgba(242,232,208,.15); padding-top: 10px; margin-top: 4px;
+  line-height: 1.6;
+}
+
+.pj-ledger {
+  background: var(--parchment); color: var(--ink); border-radius: 12px;
+  padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,.35);
+  font-family: 'Space Mono', monospace; font-size: 12.5px;
+  position: relative;
+}
+.pj-ledger:before {
+  content: '📌'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-8deg);
+  font-size: 20px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4));
+}
+.pj-ledger h3 { font-family: 'Fraunces', serif; font-size: 14px; text-align: center; margin: 4px 0 12px; letter-spacing: 1px; text-transform: uppercase; }
+.pj-ledger table { width: 100%; border-collapse: collapse; }
+.pj-ledger th, .pj-ledger td { padding: 5px 6px; text-align: center; border-bottom: 1px solid rgba(12,26,19,.15); }
+.pj-ledger th { font-weight: 700; border-bottom: 2px solid var(--ink); }
+.pj-ledger td.name-col, .pj-ledger th.name-col { text-align: left; }
+
+.pj-details-panel { text-align: left; }
+.pj-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.pj-tab-btn {
+  flex: 1; padding: 8px 4px; border-radius: 8px; text-align: center;
+  background: rgba(242,232,208,.07); border: 1px solid rgba(242,232,208,.18);
+  color: var(--text-dim); font-size: 12px; font-family: 'Inter', sans-serif;
+}
+.pj-tab-btn.active { background: var(--brass); color: #2a1c05; font-weight: 700; border-color: var(--brass); }
+.pj-details-panel table { width: 100%; border-collapse: collapse; font-family: 'Space Mono', monospace; font-size: 13px; }
+.pj-details-panel th, .pj-details-panel td { padding: 7px 6px; text-align: center; border-bottom: 1px solid rgba(242,232,208,.12); color: var(--text-light); }
+.pj-details-panel th { font-weight: 700; color: var(--brass-bright); border-bottom: 2px solid rgba(242,232,208,.3); }
+.pj-details-panel td.name-col, .pj-details-panel th.name-col { text-align: left; }
+
+.pj-summary-points { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; }
+.pj-summary-points .pt-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 10px; background: rgba(0,0,0,.18); border-radius: 6px; }
+.pj-summary-points .pt-row .label { color: var(--brass-bright); font-weight: 600; }
+.pj-summary-points .pt-row .who { color: var(--text-dim); }
+.pj-history-row { border-bottom: 1px dashed rgba(242,232,208,.12); padding: 10px 0; }
+.pj-history-row:last-child { border-bottom: none; }
+.pj-history-num { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-dim); margin-bottom: 6px; }
+
+.pj-toast {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--text-light); padding: 10px 18px;
+  border-radius: 8px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  z-index: 50; border: 1px solid var(--brass); max-width: 90%; text-align: center;
+}
+
+.pj-rules-toggle { text-align: center; margin-top: 6px; }
+.pj-rules-toggle a { color: var(--text-dim); font-size: 12.5px; cursor: pointer; text-decoration: underline; }
+.pj-rules-box { font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.pj-rules-box b { color: var(--text-light); }
+
+.pj-winner-banner { text-align: center; padding: 30px 16px; }
+.pj-official-message {
+  font-family: 'Fraunces', serif; font-style: italic; font-size: 13px;
+  color: var(--brass-bright); margin: 14px auto 0; max-width: 280px;
+  padding-top: 12px; border-top: 1px dashed rgba(242,232,208,.25);
+}
+.pj-winner-banner .crown { font-size: 40px; }
+.pj-winner-banner h2 { font-size: 30px; margin: 8px 0 4px; color: var(--brass-bright); }
+
+@media (max-width: 480px) {
+  .pj-home-hero h1 { font-size: 34px; }
+  .pj-lobby-code .code { font-size: 30px; letter-spacing: 8px; }
+  .pj-card { width: 46px; height: 64px; font-size: 16px; }
+  .pj-card .suit { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="pidjou-root">
+  <div class="pj-topbar">
+    <div class="pj-brand">Pidjou<span id="pj-tagline"></span></div>
+    <div id="pj-topbar-right"></div>
+  </div>
+  <div id="pj-app"></div>
+  <div id="pj-toast-host"></div>
+</div>
+
+<script>
+(function(){
+
+var SUITS = ["S","H","D","C"];
+var SUIT_SYMBOL = { S:"\u2660", H:"\u2665", D:"\u2666", C:"\u2663" };
+var RED_SUITS = ["H","D"];
+var RANKS = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+var RANK_VALUE = {}; RANKS.forEach(function(r,i){ RANK_VALUE[r] = i+2; });
+var GAME_POINT_VALUE = { A:4, K:3, Q:2, J:1, "10":10 };
+var MAX_PLAYERS = 5;
+var MIN_PLAYERS = 2;
+var CARDS_PER_HAND = 6;
+var MAX_BID = 9;
+var POINT_VALUE = { High: 1, Low: 1, Jack: 1, Pidjou: 5, Game: 1 };
+var DEFAULT_TARGET = 35;
+var LOG_CAP = 40;
+
+// ============================== TRANSLATIONS ==============================
+var STR = {
+  fr: {
+    tagline: "Fièrement de Saint-Vincent",
+    heroDesc: "Pidjou est un jeu de cartes traditionnel de Saint-Vincent-et-les-Grenadines, à jouer de 2 à 5, où que vous soyez. Crée une table ou rejoins celle d'un ami avec son code.",
+    onlineModeHeading: "Jouer en ligne, avec d'autres joueurs",
+    localModeHeading: "Jouer seul contre l'ordinateur",
+    localModeHint: "Partie 100% locale dans ton navigateur, sans réseau. Choisis 1 à 4 ordinateurs juste après.",
+    playVsComputerBtn: "Jouer contre l'ordinateur",
+    createTableTitle: "Créer une table",
+    namePlaceholder: "Tape ton prénom",
+    yourName: "Ton prénom",
+    createTableBtn: "Créer la table",
+    orWord: "ou",
+    joinTableTitle: "Rejoindre une table",
+    joinTableBtn: "Rejoindre une table",
+    tableCode: "Code de la table",
+    joinBtn: "Rejoindre",
+    showRules: "Voir les règles du jeu",
+    hideRules: "Masquer les règles",
+    shareCodeHint: "Partage ce code pour que les autres rejoignent",
+    localModeBadge: "🖥️ Partie locale — juste toi et l'ordinateur",
+    playersTitle: "Joueurs",
+    host: "hôte",
+    youTag: "(toi)",
+    emptySeat: "place libre",
+    targetScoreTitle: "Score cible",
+    firstDealerTitle: "Qui distribue en premier ?",
+    botNamePrefix: "Ordi",
+    botDifficulty_easy: "Facile",
+    botDifficulty_medium: "Moyen",
+    botDifficulty_hard: "Difficile",
+    addBotLabel: "Ajouter un ordinateur :",
+    log_botAdded: "{name} ({difficulty}) rejoint la table.",
+    waitingPlayers: "En attente d'au moins 2 joueurs\u2026",
+    dealStartBtn: "Distribuer et commencer",
+    leaveBtn: "Quitter",
+    dealerTag: "Donneur",
+    pitcherTag: "Pitcher",
+    cardWord: "carte",
+    scoreShort: "{n} pts",
+    cardWordPlural: "cartes",
+    waitingWord: "en attente",
+    passWord: "passe",
+    bidWord: "mise {n}",
+    targetLine: "Objectif : {n} points",
+    yourTurnBid: "À toi d'enchérir",
+    thinkingBid: "{player} réfléchit à son enchère\u2026",
+    yourTurnTrump: "Choisis l'atout",
+    thinkingTrump: "{player} choisit l'atout\u2026",
+    chooseTrumpTitle: "Quel atout ?",
+    chooseTrumpHint: "Tu garderas tes cartes de cette couleur, le reste sera échangé contre de nouvelles cartes.",
+    yourBidTitle: "Ton enchère",
+    currentBid: "Mise actuelle : {amount} par {player}",
+    noBidYet: "Aucune mise encore.",
+    passBtn: "Passer",
+    keepBidBtn: "Garder ma mise ({amount})",
+    cantPass: "Impossible de passer",
+    mustBidAtLeast1: "Tu dois miser au moins 1",
+    trumpWillBeChosen: "L'atout sera choisi par {pitcher}",
+    trumpBadge: "Atout {suit}",
+    trumpAnnounceLine: "\ud83c\udccf Atout : {suit} !",
+    gotItBtn: "Compris",
+    exchangeRow: "{player} garde {kept} carte(s) d'atout, pioche {drawn}",
+    yourTurnPlay: "À toi de jouer",
+    playingNow: "{player} joue\u2026",
+    trickPending: "Pli en attente\u2026",
+    lastTrickLabel: "Dernier pli :",
+    wonByTrump: "a coupé avec {card}",
+    wonByLedSuit: "remporte avec {card}",
+    overWord: "sur",
+    trickHistoryTitle: "Historique des plis",
+    showTrickHistory: "Voir tous les plis de la manche",
+    hideTrickHistory: "Masquer l'historique des plis",
+    trickNumLabel: "Pli {n}",
+    yourTurnTitleFlash: "À toi de jouer !",
+    liveNotYet: "pas encore",
+    liveGameTie: "égalité ({n} pts) pour l'instant",
+    livePointsTitle: "Points en cours",
+    showLivePoints: "Voir les points en cours",
+    hideLivePoints: "Masquer les points en cours",
+    showDetails: "Détails",
+    hideDetails: "Masquer les détails",
+    tabPoints: "Points",
+    tabTricks: "Plis",
+    tabScores: "Scores",
+    tabLog: "Journal",
+    playBtn: "Jouer {card}",
+    handResultTitle: "Résultat de la manche",
+    handScoresTitle: "Scores de la manche",
+    pointDetailDivider: "détail des points",
+    handBestHeadline: "a le meilleur score de la manche",
+    handTieHeadline: "égalité à {n} points ce tour",
+    contractMadeTag: "mise réussie",
+    contractFailedTag: "mise échouée",
+    madeShort: "réussie",
+    failedShort: "échouée",
+    madeContract: "{pitcher} réussit son contrat.",
+    failedContract: "{pitcher} échoue son contrat de {bid}.",
+    handWonHeadline: "réussit son contrat",
+    handFailedHeadline: "échoue son contrat de {bid}",
+    scoresDivider: "scores",
+    pitcherNote: "pitcher, mise {bid}",
+    nextHandBtn: "Manche suivante",
+    seeResultBtn: "Voir le résultat final",
+    winnerBanner: "{winner} gagne la partie\u00a0!",
+    withPoints: "avec {n} points",
+    newGameBtn: "Nouvelle partie",
+    ledgerTitle: "Feuille de marque",
+    playerCol: "Joueur",
+    scoreCol: "Score",
+    ledgerFooter: "Objectif : {target} pts \u00b7 Manche {hand}",
+    showLedger: "Voir la feuille de marque",
+    hideLedger: "Masquer la feuille de marque",
+    notDealt: "non distribué",
+    jackDetail: "valet d'atout",
+    pidjouDetail: "5 d'atout",
+    tieOrNone: "égalité / aucun",
+    cardPointsSuffix: "{n} pts de cartes",
+    gameTieDetail: "égalité ({n} pts) \u2014 au pitcher",
+    toastEnterName: "Entre ton prénom.",
+    toastEnterCodeName: "Entre le code de la table et ton prénom.",
+    toastEnterCode: "Entre le code de la table.",
+    toastMustFollow: "Tu dois suivre {suit} (ou couper à l'atout) si tu peux.",
+    toastTableNotFound: "Table introuvable. Vérifie le code.",
+    toastGameStarted: "La partie a déjà commencé sur cette table.",
+    toastTableFull: "Table complète (5 joueurs max).",
+    toastRoomNotFound: "Salle introuvable.",
+    toastNetworkError: "Problème réseau, réessaie.",
+    toastInvalidTarget: "Le score cible doit être entre 5 et 200.",
+    toastCodeCopied: "Code copié : {code}",
+    toastCode: "Code : {code}",
+    playAnthemTitle: "Écouter l'hymne national",
+    toastAnthemPlaying: "🇻🇨 Hymne national de Saint-Vincent-et-les-Grenadines",
+    officialCongrats: "L'Association Officielle des Joueurs de Pidjou de Saint-Vincent te félicite !",
+    contractStatsTitle: "Contrats réussis",
+    finalRankingTitle: "Classement final",
+    contractsMadeCol: "Réussis",
+    toastTargetSaved: "Score cible enregistré.",
+    validateBtn: "Valider",
+    errNeed2: "Il faut au moins 2 joueurs.",
+    confirmLeaveActiveGame: "La partie est en cours. Si tu quittes maintenant, tu risques de perdre ta place et de gêner les autres joueurs. Vraiment quitter ?",
+    confirmLeaveActiveGameLocal: "La partie est en cours. Si tu quittes maintenant, tu perdras ta progression. Vraiment quitter ?",
+    suit_S: "Pique", suit_H: "Cœur", suit_D: "Carreau", suit_C: "Trèfle",
+    log_tableCreated: "La table a été créée par {host}.",
+    log_playerJoined: "{name} rejoint la table.",
+    log_dealStart: "Manche {n} \u2014 {dealer} distribue.",
+    log_bidPass: "{player} passe.",
+    log_bidAmount: "{player} mise {amount}.",
+    log_bidForced: "{player} est forcé de miser 1.",
+    log_autoBid1: "{player} ouvre automatiquement à 1.",
+    log_keepBid: "{player} garde sa mise à 1.",
+    log_bidWon: "{pitcher} remporte l'enchère à {amount}. À {pitcher} de choisir l'atout.",
+    log_trumpSet: "Atout : {suit}.",
+    log_discardDraw: "{player} garde {kept} carte(s) d'atout et pioche {drawn}.",
+    log_cardPlayed: "{player} joue {card}.",
+    log_trickWon: "{player} remporte le pli.",
+    log_handMadeResult: "{pitcher} réussit son contrat ({bid}) et marque {earned} pt(s).",
+    log_handFailedResult: "{pitcher} échoue son contrat de {bid} et perd {bid} pt(s).",
+    log_handFailedNoPenalty: "{pitcher} échoue sa mise automatique de 1 — sans pénalité.",
+    log_gameWon: "\ud83c\udfc6 {winner} remporte la partie avec {score} points\u00a0!",
+    log_newGame: "\u2014 Nouvelle partie \u2014",
+    rulesHtml: "<p><b>But :</b> être le premier à atteindre {target} points.</p>"
+      + "<p><b>Donne :</b> 6 cartes chacun. L'hôte choisit qui distribue en premier ; le donneur change ensuite à chaque manche.</p>"
+      + "<p><b>Enchères :</b> le joueur à gauche du donneur ouvre automatiquement à 1. Les autres misent (jusqu'à 9) ou passent, dans l'ordre, jusqu'au donneur. Puis ça revient une dernière fois sur ce premier joueur, qui peut monter sa mise ou la garder à 1.</p>"
+      + "<p><b>Atout :</b> celui qui remporte l'enchère (le \u00ab\u00a0pitcher\u00a0\u00bb) annonce directement la couleur d'atout.</p>"
+      + "<p><b>Échange :</b> tout le monde (pitcher inclus) garde uniquement ses cartes de la couleur d'atout, défausse le reste, et pioche pour revenir à 6 cartes.</p>"
+      + "<p><b>Jouer :</b> si le pli est mené à l'atout, tu dois suivre l'atout si tu en as. Si le pli est mené dans une autre couleur, tu joues ce que tu veux, sans restriction. L'atout bat toujours les autres couleurs.</p>"
+      + "<p><b>Points par manche (9 max) :</b> High (1 pt, plus gros atout joué), Low (1 pt, plus petit atout joué \u2014 pour son joueur, même si un autre remporte le pli), Jack (1 pt, qui remporte le pli du valet d'atout), <b>Pidjou (5 pts !)</b> qui remporte le pli du 5 d'atout, Game (1 pt, qui cumule le plus de valeur dans les plis qu'il a remportés : As=4, Roi=3, Dame=2, Valet=1, 10=10 \u2014 en cas d'égalité, le point va au pitcher).</p>"
+      + "<p><b>Le pitcher</b> ne marque ses points que s'il atteint sa mise, sinon il perd ce nombre de points (score négatif possible), même si sa mise était l'ouverture automatique à 1.</p>"
+  },
+  en: {
+    tagline: "Proudly from Saint Vincent",
+    heroDesc: "Pidjou is a traditional card game from Saint Vincent & the Grenadines, for 2 to 5 players, wherever you are. Create a table or join a friend's with their code.",
+    onlineModeHeading: "Play online, with other players",
+    localModeHeading: "Play solo against the computer",
+    localModeHint: "A fully local game in your browser, no network needed. Pick 1 to 4 computer opponents next.",
+    playVsComputerBtn: "Play vs computer",
+    createTableTitle: "Create a table",
+    namePlaceholder: "Type your name",
+    yourName: "Your name",
+    createTableBtn: "Create table",
+    orWord: "or",
+    joinTableTitle: "Join a table",
+    joinTableBtn: "Join a table",
+    tableCode: "Table code",
+    joinBtn: "Join",
+    showRules: "Show the rules",
+    hideRules: "Hide the rules",
+    shareCodeHint: "Share this code so others can join",
+    localModeBadge: "🖥️ Local game — just you and the computer",
+    playersTitle: "Players",
+    host: "host",
+    youTag: "(you)",
+    emptySeat: "open seat",
+    targetScoreTitle: "Target score",
+    firstDealerTitle: "Who deals first?",
+    botNamePrefix: "Bot",
+    botDifficulty_easy: "Easy",
+    botDifficulty_medium: "Medium",
+    botDifficulty_hard: "Hard",
+    addBotLabel: "Add a computer:",
+    log_botAdded: "{name} ({difficulty}) joins the table.",
+    waitingPlayers: "Waiting for at least 2 players\u2026",
+    dealStartBtn: "Deal and start",
+    leaveBtn: "Leave",
+    dealerTag: "Dealer",
+    pitcherTag: "Pitcher",
+    cardWord: "card",
+    scoreShort: "{n} pts",
+    cardWordPlural: "cards",
+    waitingWord: "waiting",
+    passWord: "pass",
+    bidWord: "bid {n}",
+    targetLine: "Target: {n} points",
+    yourTurnBid: "Your turn to bid",
+    thinkingBid: "{player} is thinking\u2026",
+    yourTurnTrump: "Choose trump",
+    thinkingTrump: "{player} is choosing trump\u2026",
+    chooseTrumpTitle: "Which suit is trump?",
+    chooseTrumpHint: "You'll keep your cards of this suit; the rest get swapped for new cards.",
+    yourBidTitle: "Your bid",
+    currentBid: "Current bid: {amount} by {player}",
+    noBidYet: "No bid yet.",
+    passBtn: "Pass",
+    keepBidBtn: "Keep my bid ({amount})",
+    cantPass: "Can't pass",
+    mustBidAtLeast1: "You must bid at least 1",
+    trumpWillBeChosen: "Trump will be set by {pitcher}",
+    trumpBadge: "Trump {suit}",
+    trumpAnnounceLine: "\ud83c\udccf Trump: {suit}!",
+    gotItBtn: "Got it",
+    exchangeRow: "{player} keeps {kept} trump card(s), draws {drawn}",
+    yourTurnPlay: "Your turn to play",
+    playingNow: "{player} is playing\u2026",
+    trickPending: "Waiting for the trick\u2026",
+    lastTrickLabel: "Last trick:",
+    wonByTrump: "cut with {card}",
+    wonByLedSuit: "wins with {card}",
+    overWord: "over",
+    trickHistoryTitle: "Trick history",
+    showTrickHistory: "Show all tricks this hand",
+    hideTrickHistory: "Hide trick history",
+    trickNumLabel: "Trick {n}",
+    yourTurnTitleFlash: "Your turn!",
+    liveNotYet: "not yet",
+    liveGameTie: "tied ({n} pts) for now",
+    livePointsTitle: "Live points",
+    showLivePoints: "Show live points",
+    hideLivePoints: "Hide live points",
+    showDetails: "Details",
+    hideDetails: "Hide details",
+    tabPoints: "Points",
+    tabTricks: "Tricks",
+    tabScores: "Scores",
+    tabLog: "Log",
+    playBtn: "Play {card}",
+    handResultTitle: "Hand result",
+    handScoresTitle: "Hand scores",
+    pointDetailDivider: "point details",
+    handBestHeadline: "has the best score this round",
+    handTieHeadline: "tied at {n} this round",
+    contractMadeTag: "bid made",
+    contractFailedTag: "bid failed",
+    madeShort: "made",
+    failedShort: "failed",
+    madeContract: "{pitcher} makes the bid.",
+    failedContract: "{pitcher} fails the bid of {bid}.",
+    handWonHeadline: "makes the bid",
+    handFailedHeadline: "fails the {bid}-bid contract",
+    scoresDivider: "scores",
+    pitcherNote: "pitcher, bid {bid}",
+    nextHandBtn: "Next hand",
+    seeResultBtn: "See final result",
+    winnerBanner: "{winner} wins the game!",
+    withPoints: "with {n} points",
+    newGameBtn: "New game",
+    ledgerTitle: "Score sheet",
+    playerCol: "Player",
+    scoreCol: "Score",
+    ledgerFooter: "Target: {target} pts \u00b7 Hand {hand}",
+    showLedger: "Show the score sheet",
+    hideLedger: "Hide the score sheet",
+    notDealt: "not dealt",
+    jackDetail: "trump Jack",
+    pidjouDetail: "trump 5",
+    tieOrNone: "tie / none",
+    cardPointsSuffix: "{n} card points",
+    gameTieDetail: "tie ({n} pts) \u2014 goes to the pitcher",
+    toastEnterName: "Enter your name.",
+    toastEnterCodeName: "Enter the table code and your name.",
+    toastEnterCode: "Enter the table code.",
+    toastMustFollow: "You must follow {suit} (or cut with trump) if you can.",
+    toastTableNotFound: "Table not found. Check the code.",
+    toastGameStarted: "This table's game has already started.",
+    toastTableFull: "Table is full (5 players max).",
+    toastRoomNotFound: "Room not found.",
+    toastNetworkError: "Network hiccup, try again.",
+    toastInvalidTarget: "Target score must be between 5 and 200.",
+    toastCodeCopied: "Code copied: {code}",
+    toastCode: "Code: {code}",
+    playAnthemTitle: "Play the national anthem",
+    toastAnthemPlaying: "🇻🇨 National anthem of Saint Vincent & the Grenadines",
+    officialCongrats: "The Official Pidjou Players Association of Saint Vincent congratulates you!",
+    contractStatsTitle: "Contracts made",
+    finalRankingTitle: "Final ranking",
+    contractsMadeCol: "Made",
+    toastTargetSaved: "Target score saved.",
+    validateBtn: "Save",
+    errNeed2: "You need at least 2 players.",
+    confirmLeaveActiveGame: "The game is in progress. If you leave now, you might lose your spot and disrupt the other players. Really leave?",
+    confirmLeaveActiveGameLocal: "The game is in progress. If you leave now, you'll lose your progress. Really leave?",
+    suit_S: "Spades", suit_H: "Hearts", suit_D: "Diamonds", suit_C: "Clubs",
+    log_tableCreated: "{host} created the table.",
+    log_playerJoined: "{name} joined the table.",
+    log_dealStart: "Hand {n} \u2014 {dealer} deals.",
+    log_bidPass: "{player} passes.",
+    log_bidAmount: "{player} bids {amount}.",
+    log_bidForced: "{player} is forced to bid 1.",
+    log_autoBid1: "{player} automatically opens at 1.",
+    log_keepBid: "{player} keeps their bid at 1.",
+    log_bidWon: "{pitcher} wins the bid at {amount}. {pitcher} will choose trump.",
+    log_trumpSet: "Trump: {suit}.",
+    log_discardDraw: "{player} keeps {kept} trump card(s) and draws {drawn}.",
+    log_cardPlayed: "{player} plays {card}.",
+    log_trickWon: "{player} wins the trick.",
+    log_handMadeResult: "{pitcher} makes the {bid}-bid contract and scores {earned} pt(s).",
+    log_handFailedResult: "{pitcher} fails the {bid}-bid contract and loses {bid} pt(s).",
+    log_handFailedNoPenalty: "{pitcher} fails their automatic 1-bid — no penalty.",
+    log_gameWon: "\ud83c\udfc6 {winner} wins the game with {score} points!",
+    log_newGame: "\u2014 New game \u2014",
+    rulesHtml: "<p><b>Goal:</b> be the first to reach {target} points.</p>"
+      + "<p><b>Deal:</b> 6 cards each. The host picks who deals first; the dealer then rotates every hand.</p>"
+      + "<p><b>Bidding:</b> the player to the dealer's left automatically opens at 1. The others bid (up to 9) or pass, in order, through the dealer. Then it comes back one last time to that first player, who can raise their bid or keep it at 1.</p>"
+      + "<p><b>Trump:</b> whoever wins the bid (the \u201cpitcher\u201d) directly announces the trump suit.</p>"
+      + "<p><b>Exchange:</b> everyone (pitcher included) keeps only their cards of the trump suit, discards the rest, and draws back up to 6 cards.</p>"
+      + "<p><b>Playing:</b> if the trick is led with trump, you must follow trump if you hold any. If it's led with any other suit, you may play whatever you want, no restriction. Trump always beats other suits.</p>"
+      + "<p><b>Points per hand (9 max):</b> High (1 pt, highest trump played), Low (1 pt, lowest trump played \u2014 credited to whoever played it, even if someone else wins that trick), Jack (1 pt, whoever wins the trick with the trump Jack), <b>Pidjou (5 pts!)</b> whoever wins the trick with the trump 5, Game (1 pt, whoever's own captured tricks add up to the most card value: Ace=4, King=3, Queen=2, Jack=1, 10=10 \u2014 on a tie, the point goes to the pitcher).</p>"
+      + "<p><b>The pitcher</b> only scores their earned points if they meet their bid \u2014 otherwise they lose that many points (score can go negative), even if their bid was the automatic opening 1.</p>"
+  }
+};
+
+// ============================== STORAGE (Firebase Realtime Database) ==============================
+// \u2193\u2193\u2193 REMPLACE la ligne ci-dessous par TON URL Firebase (voir les instructions fournies) \u2193\u2193\u2193
+var FIREBASE_DB_URL = "https://pidjou-default-rtdb.europe-west1.firebasedatabase.app";
+// \u2191\u2191\u2191 REMPLACE la ligne ci-dessus par TON URL Firebase \u2191\u2191\u2191
+
+var STORAGE_CONFIGURED = FIREBASE_DB_URL.indexOf("REMPLACE-MOI") === -1;
+
+function roomUrl(code){ return FIREBASE_DB_URL.replace(/\/$/, "") + "/rooms/" + code + ".json"; }
+
+function normalizeRoom(data){
+  if (!data) return data;
+  data.currentTrick = data.currentTrick || [];
+  data.trickLog = data.trickLog || [];
+  data.bots = data.bots || {};
+  data.gameNumber = data.gameNumber || 1;
+  data.log = data.log || [];
+  data.hands = data.hands || {};
+  data.scores = data.scores || {};
+  data.stock = data.stock || [];
+  data.gameHistory = data.gameHistory || [];
+  (data.players || []).forEach(function(p){
+    if (!data.hands[p]) data.hands[p] = [];
+    if (typeof data.scores[p] !== "number") data.scores[p] = 0;
+  });
+  if (data.bidding){
+    data.bidding.bids = data.bidding.bids || {};
+    data.bidding.order = data.bidding.order || [];
+  }
+  return data;
+}
+async function loadRoom(code){
+  try {
+    var res = await fetch(roomUrl(code));
+    if (!res.ok) return null;
+    var data = await res.json();
+    return normalizeRoom(data) || null;
+  } catch(e) { return null; }
+}
+async function saveRoom(code, state){
+  await fetch(roomUrl(code), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(state)
+  });
+}
+
+// ============================== CARD HELPERS ==============================
+function makeCard(rank, suit){ return rank + suit; }
+function rankOf(card){ return card.slice(0, -1); }
+function suitOf(card){ return card.slice(-1); }
+function rankVal(card){ return RANK_VALUE[rankOf(card)]; }
+function isRed(card){ return RED_SUITS.indexOf(suitOf(card)) !== -1; }
+function cardSortKey(card){ return SUITS.indexOf(suitOf(card))*100 + rankVal(card); }
+function buildDeck(){
+  var deck = [];
+  for (var s=0;s<SUITS.length;s++) for (var r=0;r<RANKS.length;r++) deck.push(makeCard(RANKS[r], SUITS[s]));
+  return deck;
+}
+function secureRandom(){
+  // Cryptographically secure uniform [0,1), same RNG class real-money card platforms use.
+  // Falls back to Math.random() only if the Web Crypto API is unavailable (very old browsers).
+  if (typeof crypto !== "undefined" && crypto.getRandomValues){
+    var buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return buf[0] / 4294967296; // 2^32
+  }
+  return Math.random();
+}
+function shuffle(arr){
+  // Fisher-Yates (Knuth) shuffle: the standard, provably-unbiased algorithm for a uniformly
+  // random permutation — every one of the n! orderings is equally likely.
+  var a = arr.slice();
+  for (var i=a.length-1;i>0;i--){
+    var j = Math.floor(secureRandom()*(i+1));
+    var tmp = a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function genRoomCode(){
+  var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  var s = "";
+  for (var i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+// ============================== GAME LOGIC ==============================
+function freshRoomState(code, hostName){
+  var scores = {}; scores[hostName] = 0;
+  return {
+    code: code, version: 0, createdAt: Date.now(),
+    players: [hostName], targetScore: DEFAULT_TARGET, chosenDealer: hostName, bots: {},
+    phase: "lobby", dealerIndex: -1, hands: {}, bidding: null,
+    trump: null, pitcher: null, leadIndex: 0, turnIndex: 0,
+    currentTrick: [], trickLog: [], scores: scores,
+    handNumber: 0, gameNumber: 1, lastHandSummary: null, winner: null, gameHistory: [],
+    log: [ { key: "log_tableCreated", params: { host: hostName } } ]
+  };
+}
+function pushLog(state, key, params){
+  state.log.push({ key: key, params: params || {} });
+  if (state.log.length > LOG_CAP) state.log = state.log.slice(-LOG_CAP);
+}
+function startHand(state){
+  var n = state.players.length;
+  if (state.handNumber === 0 && state.chosenDealer){
+    var chosenIdx = state.players.indexOf(state.chosenDealer);
+    if (chosenIdx !== -1) state.dealerIndex = (chosenIdx - 1 + n) % n;
+  }
+  state.dealerIndex = (state.dealerIndex + 1) % n;
+  var dealer = state.players[state.dealerIndex];
+  var deck = shuffle(buildDeck());
+  var hands = {};
+  state.players.forEach(function(p){ hands[p] = []; });
+  var di = 0;
+  for (var c=0;c<CARDS_PER_HAND;c++){
+    for (var i=0;i<n;i++){ hands[state.players[i]].push(deck[di++]); }
+  }
+  state.players.forEach(function(p){ hands[p].sort(function(a,b){ return cardSortKey(a)-cardSortKey(b); }); });
+  state.hands = hands;
+  state.stock = deck.slice(di);
+
+  // The player to the dealer's left gets an automatic standing bid of 1 (no active turn for it).
+  // Bidding then goes normally from the 2nd player through the dealer, then wraps back to that
+  // first player for one final real turn (raise, or keep their 1).
+  var firstBidder = state.players[(state.dealerIndex+1)%n];
+  var order = [];
+  for (var k=2;k<=n;k++) order.push(state.players[(state.dealerIndex+k)%n]);
+  order.push(firstBidder);
+  var seededBids = {}; seededBids[firstBidder] = 1;
+  state.bidding = { order: order, turnPtr: 0, bids: seededBids, highest: { player: firstBidder, amount: 1 }, firstBidder: firstBidder };
+
+  state.trump = null; state.pitcher = null; state.currentTrick = []; state.trickLog = [];
+  state.exchangeSummary = null; state.lastTrick = null;
+  state.lastHandSummary = null; state.phase = "bidding"; state.handNumber += 1;
+  pushLog(state, "log_dealStart", { n: state.handNumber, dealer: dealer });
+  pushLog(state, "log_autoBid1", { player: firstBidder });
+}
+function placeBid(state, player, amount){
+  if (state.phase !== "bidding") throw new Error("not-bidding-phase");
+  var b = state.bidding;
+  if (b.order[b.turnPtr] !== player) throw new Error("not-your-turn");
+  var isFinalWrapTurn = player === b.firstBidder;
+
+  if (amount === "pass"){
+    // The first bidder's final turn just means "keep my standing 1" — their bid isn't withdrawn.
+    if (!isFinalWrapTurn){
+      b.bids[player] = "pass";
+      pushLog(state, "log_bidPass", { player: player });
+    } else {
+      pushLog(state, "log_keepBid", { player: player });
+    }
+  } else {
+    var min = b.highest.amount + 1;
+    if (amount < min || amount > MAX_BID) throw new Error("invalid-bid");
+    b.bids[player] = amount;
+    b.highest = { player: player, amount: amount };
+    pushLog(state, "log_bidAmount", { player: player, amount: amount });
+  }
+
+  b.turnPtr += 1;
+  if (b.turnPtr >= b.order.length){
+    state.pitcher = b.highest.player;
+    state.leadIndex = state.players.indexOf(state.pitcher);
+    state.turnIndex = state.leadIndex;
+    state.phase = "chooseTrump";
+    pushLog(state, "log_bidWon", { pitcher: state.pitcher, amount: b.highest.amount });
+  }
+}
+function chooseTrump(state, player, suit){
+  if (state.phase !== "chooseTrump") throw new Error("not-choose-trump-phase");
+  if (player !== state.pitcher) throw new Error("not-your-turn");
+  if (SUITS.indexOf(suit) === -1) throw new Error("invalid-suit");
+
+  state.trump = suit;
+  pushLog(state, "log_trumpSet", { suit: "{{suit:" + suit + "}}" });
+
+  // Everyone keeps only trump cards; the rest goes into a shared pool with the leftover stock.
+  var pool = (state.stock || []).slice();
+  var kept = {};
+  state.players.forEach(function(p){
+    var hand = state.hands[p] || [];
+    var trumpCards = hand.filter(function(c){ return suitOf(c) === suit; });
+    var others = hand.filter(function(c){ return suitOf(c) !== suit; });
+    kept[p] = trumpCards;
+    pool = pool.concat(others);
+  });
+  pool = shuffle(pool);
+
+  var summary = [];
+  var pi = 0;
+  state.players.forEach(function(p){
+    var need = CARDS_PER_HAND - kept[p].length;
+    var drawn = pool.slice(pi, pi + need);
+    pi += need;
+    state.hands[p] = kept[p].concat(drawn).sort(function(a,b){ return cardSortKey(a)-cardSortKey(b); });
+    summary.push({ player: p, kept: kept[p].length, drawn: drawn.length });
+    pushLog(state, "log_discardDraw", { player: p, kept: kept[p].length, drawn: drawn.length });
+  });
+  state.stock = pool.slice(pi);
+  state.exchangeSummary = summary;
+
+  state.phase = "playing";
+}
+function legalCards(hand, currentTrick, trump){
+  if (currentTrick.length === 0) return hand.slice();
+  var led = suitOf(currentTrick[0].card);
+  if (led === trump){
+    // Trump was led: you must follow trump if you hold any.
+    var trumps = hand.filter(function(c){ return suitOf(c) === trump; });
+    return trumps.length ? trumps : hand.slice();
+  }
+  // Any other suit was led: no restriction at all — play anything from your hand.
+  return hand.slice();
+}
+function trickWinnerPlay(trick, trump){
+  var trumps = trick.filter(function(c){ return suitOf(c.card) === trump; });
+  var ledSuit = suitOf(trick[0].card);
+  var pool = trumps.length ? trumps : trick.filter(function(c){ return suitOf(c.card) === ledSuit; });
+  var best = pool[0];
+  pool.forEach(function(c){ if (rankVal(c.card) > rankVal(best.card)) best = c; });
+  var runnerUp = null;
+  pool.forEach(function(c){
+    if (c === best) return;
+    if (!runnerUp || rankVal(c.card) > rankVal(runnerUp.card)) runnerUp = c;
+  });
+  return { player: best.player, card: best.card, wonByTrump: trumps.length > 0, runnerUpCard: runnerUp ? runnerUp.card : null };
+}
+function computePointsSnapshot(trickLog, players, trump, forceTieToPitcher, pitcher){
+  var allPlays = [];
+  trickLog.forEach(function(t){ t.cards.forEach(function(c){ allPlays.push({ player: c.player, card: c.card, trickWinner: t.winner }); }); });
+  var trumpPlays = allPlays.filter(function(p){ return suitOf(p.card) === trump; });
+
+  var highPt = null, lowPt = null, jackPt = null, pidjouPt = null;
+  if (trumpPlays.length){
+    var hi = trumpPlays[0], lo = trumpPlays[0];
+    trumpPlays.forEach(function(p){
+      if (rankVal(p.card) > rankVal(hi.card)) hi = p;
+      if (rankVal(p.card) < rankVal(lo.card)) lo = p;
+    });
+    highPt = { player: hi.player, card: hi.card };
+    lowPt = { player: lo.player, card: lo.card };
+  }
+  var jackPlay = trumpPlays.filter(function(p){ return rankOf(p.card) === "J"; })[0];
+  if (jackPlay) jackPt = { player: jackPlay.trickWinner, card: jackPlay.card };
+  var pidjouPlay = trumpPlays.filter(function(p){ return rankOf(p.card) === "5"; })[0];
+  if (pidjouPlay) pidjouPt = { player: pidjouPlay.trickWinner, card: pidjouPlay.card };
+
+  var totals = {};
+  players.forEach(function(p){ totals[p] = 0; });
+  trickLog.forEach(function(t){
+    var val = t.cards.reduce(function(sum,c){ return sum + (GAME_POINT_VALUE[rankOf(c.card)] || 0); }, 0);
+    totals[t.winner] += val;
+  });
+  var gamePt = null;
+  var totalVals = players.map(function(p){ return totals[p]; });
+  var maxTotal = Math.max.apply(null, totalVals);
+  var gameTiedWinners = players.filter(function(p){ return totals[p] === maxTotal; });
+  if (gameTiedWinners.length === 1){
+    gamePt = { player: gameTiedWinners[0], total: maxTotal, tie: false };
+  } else if (forceTieToPitcher){
+    gamePt = { player: pitcher, total: maxTotal, tie: true };
+  } else {
+    gamePt = { player: null, total: maxTotal, tie: true, tiedPlayers: gameTiedWinners };
+  }
+
+  return [
+    { label: "High", winner: highPt ? highPt.player : null, card: highPt ? highPt.card : null, kind: "card", value: POINT_VALUE.High },
+    { label: "Low", winner: lowPt ? lowPt.player : null, card: lowPt ? lowPt.card : null, kind: "card", value: POINT_VALUE.Low },
+    { label: "Jack", winner: jackPt ? jackPt.player : null, card: jackPt ? jackPt.card : null, kind: "jack", value: POINT_VALUE.Jack },
+    { label: "Pidjou", winner: pidjouPt ? pidjouPt.player : null, card: pidjouPt ? pidjouPt.card : null, kind: "pidjou", value: POINT_VALUE.Pidjou },
+    { label: "Game", winner: gamePt.player, total: gamePt.total, tie: gamePt.tie, kind: "game", value: POINT_VALUE.Game }
+  ];
+}
+function playCard(state, player, card){
+  if (state.phase !== "playing") throw new Error("not-playing-phase");
+  var n = state.players.length;
+  if (state.players[state.turnIndex] !== player) throw new Error("not-your-turn");
+  var hand = state.hands[player];
+  if (hand.indexOf(card) === -1) throw new Error("card-not-in-hand");
+  var legal = legalCards(hand, state.currentTrick, state.trump);
+  if (legal.indexOf(card) === -1) throw new Error("must-follow-suit");
+
+  state.hands[player] = hand.filter(function(c){ return c !== card; });
+  state.currentTrick.push({ player: player, card: card });
+  pushLog(state, "log_cardPlayed", { player: player, card: "{{card:" + card + "}}" });
+
+  if (state.currentTrick.length === n){
+    var win = trickWinnerPlay(state.currentTrick, state.trump);
+    state.trickLog.push({ winner: win.player, cards: state.currentTrick });
+    state.lastTrick = { winner: win.player, card: win.card, wonByTrump: win.wonByTrump, runnerUpCard: win.runnerUpCard, cards: state.currentTrick };
+    pushLog(state, "log_trickWon", { player: win.player });
+    state.currentTrick = [];
+    state.leadIndex = state.players.indexOf(win.player);
+    state.turnIndex = state.leadIndex;
+    var handEmpty = state.players.every(function(p){ return state.hands[p].length === 0; });
+    if (handEmpty){ resolveHand(state); return; }
+  } else {
+    state.turnIndex = (state.turnIndex + 1) % n;
+  }
+}
+function resolveHand(state){
+  var trump = state.trump;
+  var points = computePointsSnapshot(state.trickLog, state.players, trump, true, state.pitcher);
+
+  var earned = {};
+  state.players.forEach(function(p){ earned[p] = 0; });
+  points.forEach(function(pt){ if (pt.winner) earned[pt.winner] += pt.value; });
+
+  var bidAmount = state.bidding.highest.amount;
+  var pitcher = state.pitcher;
+  var pitcherMade = earned[pitcher] >= bidAmount;
+
+  var deltas = {};
+  state.players.forEach(function(p){
+    deltas[p] = (p === pitcher) ? (pitcherMade ? earned[p] : -bidAmount) : earned[p];
+  });
+  state.players.forEach(function(p){ state.scores[p] = (state.scores[p]||0) + deltas[p]; });
+
+  state.lastHandSummary = { points: points, pitcher: pitcher, bid: bidAmount, made: pitcherMade, earned: earned, deltas: deltas, trump: trump };
+  state.gameHistory = state.gameHistory || [];
+  state.gameHistory.push({ handNumber: state.handNumber, pitcher: pitcher, bid: bidAmount, made: pitcherMade });
+  state.phase = "handSummary";
+  if (pitcherMade) pushLog(state, "log_handMadeResult", { pitcher: pitcher, bid: bidAmount, earned: earned[pitcher] });
+  else pushLog(state, "log_handFailedResult", { pitcher: pitcher, bid: bidAmount });
+
+  var winner = null;
+  if (pitcherMade && state.scores[pitcher] >= state.targetScore){
+    winner = pitcher;
+  } else {
+    var candidates = state.players.filter(function(p){ return state.scores[p] >= state.targetScore; });
+    if (candidates.length){
+      winner = candidates.reduce(function(best,p){ return state.scores[p] > state.scores[best] ? p : best; }, candidates[0]);
+    }
+  }
+  if (winner){
+    state.winner = winner;
+    pushLog(state, "log_gameWon", { winner: winner, score: state.scores[winner] });
+  }
+}
+
+// ============================== BOT AI ==============================
+var BOT_DIFFICULTIES = ["easy", "medium", "hard"];
+function botEvaluateSuit(hand, suit){
+  var cards = hand.filter(function(c){ return suitOf(c) === suit; });
+  var ranks = cards.map(rankOf);
+  var hasAce = ranks.indexOf("A") !== -1;
+  var hasKing = ranks.indexOf("K") !== -1;
+  var hasJack = ranks.indexOf("J") !== -1;
+  var hasFive = ranks.indexOf("5") !== -1;
+  var hasLowCard = cards.some(function(c){ return rankVal(c) <= 4; }); // 2,3,4: plausibly the lowest trump in play
+  // "Protection": another trump card strong enough that we're likely to win the trick even if
+  // the Jack/5 alone wouldn't (mirrors: "you have the Pidjou AND something to protect it").
+  var protection = cards.filter(function(c){ return rankVal(c) >= rankVal("Q" + suit); }).length;
+
+  var securedPoints = 0;
+  if (hasAce) securedPoints += 1; // High: guaranteed if we hold the top trump
+  else if (hasKing) securedPoints += 0.5; // decent chance, not certain
+  if (hasLowCard) securedPoints += 1; // Low: likely if we hold a very low trump
+  if (hasJack) securedPoints += (hasAce || protection >= 1) ? 1 : 0.4; // Jack: needs protection to feel safe
+  if (hasFive) securedPoints += (hasAce || protection >= 1) ? 5 : 2; // Pidjou (5 pts): same idea, higher stakes
+  var gameVal = cards.reduce(function(s,c){ return s + (GAME_POINT_VALUE[rankOf(c)] || 0); }, 0);
+  securedPoints += Math.min(1, gameVal / 15); // Game: rough partial credit from held high cards
+
+  return { suit: suit, count: cards.length, securedPoints: securedPoints };
+}
+function botBestSuit(hand){
+  var evals = SUITS.map(function(s){ return botEvaluateSuit(hand, s); });
+  evals.sort(function(a,b){ return b.securedPoints - a.securedPoints; });
+  return evals[0];
+}
+function botDecideBid(botName, difficulty, room){
+  var hand = room.hands[botName] || [];
+  var best = botBestSuit(hand);
+  var min = room.bidding.highest.amount + 1;
+  if (min > MAX_BID) return "pass";
+  // Bid roughly what we can concretely expect to secure (High/Low/Jack/Pidjou/Game), shaved down
+  // a bit for safety since failing a bid costs the FULL amount, not just the shortfall.
+  // Easy stays loose/erratic instead of reasoning about securable points — that's what makes it weak.
+  var estimate;
+  if (difficulty === "easy"){
+    var randomFactor = 0.5 + Math.random()*1.1;
+    estimate = Math.round(best.securedPoints * randomFactor);
+  } else {
+    estimate = Math.floor(best.securedPoints);
+  }
+  estimate = Math.min(estimate, best.count + 1);
+  estimate = Math.max(0, Math.min(MAX_BID, estimate));
+  if (estimate >= min) return Math.min(estimate, MAX_BID);
+  return "pass";
+}
+function botDecideTrump(botName, room){
+  var hand = room.hands[botName] || [];
+  return botBestSuit(hand).suit;
+}
+function botFindWinners(legal, room){
+  var ledSuit = suitOf(room.currentTrick[0].card);
+  var trumpsInTrick = room.currentTrick.filter(function(c){ return suitOf(c.card) === room.trump; });
+  var currentBest = trumpsInTrick.length
+    ? trumpsInTrick.reduce(function(a,b){ return rankVal(b.card)>rankVal(a.card)?b:a; })
+    : room.currentTrick.filter(function(c){ return suitOf(c.card)===ledSuit; }).reduce(function(a,b){ return rankVal(b.card)>rankVal(a.card)?b:a; }, room.currentTrick[0]);
+  return legal.filter(function(c){
+    if (suitOf(c) === room.trump && suitOf(currentBest.card) !== room.trump) return true;
+    if (suitOf(c) === suitOf(currentBest.card)) return rankVal(c) > rankVal(currentBest.card);
+    return false;
+  });
+}
+function isKeyTrump(c, trump){ return suitOf(c) === trump && (rankOf(c) === "J" || rankOf(c) === "5"); }
+function botDecideCard(botName, difficulty, room){
+  var hand = room.hands[botName] || [];
+  var legal = legalCards(hand, room.currentTrick, room.trump);
+  if (!legal.length) return null;
+  if (difficulty === "easy") return legal[Math.floor(Math.random()*legal.length)];
+
+  // Medium and hard share this reactive strategy: lead low non-trump to probe and conserve
+  // trump; when following, win as cheaply as possible, else discard the lowest legal card.
+  // One targeted exception: never voluntarily lead or throw away the trump Jack/5 (worth real
+  // points) when a plain alternative exists and playing them wins nothing — but never hesitate
+  // to use them normally when they're the card that actually wins the trick.
+  if (room.currentTrick.length === 0){
+    var nonTrumpLegal = legal.filter(function(c){ return suitOf(c) !== room.trump; });
+    var pool = (nonTrumpLegal.length ? nonTrumpLegal : legal);
+    var poolSafe = pool.filter(function(c){ return !isKeyTrump(c, room.trump); });
+    var finalPool = (poolSafe.length ? poolSafe : pool).slice();
+    finalPool.sort(function(a,b){ return rankVal(a)-rankVal(b); });
+    return finalPool[0];
+  }
+  var winners = botFindWinners(legal, room);
+  if (winners.length){
+    return winners.slice().sort(function(a,b){ return rankVal(a)-rankVal(b); })[0];
+  }
+  var safeDiscards = legal.filter(function(c){ return !isKeyTrump(c, room.trump); });
+  var finalDiscards = (safeDiscards.length ? safeDiscards : legal).slice();
+  finalDiscards.sort(function(a,b){ return rankVal(a)-rankVal(b); });
+  return finalDiscards[0];
+}
+
+// ============================== CLIENT RUNTIME ==============================
+var client = { myName: null, roomCode: null, room: null, busy: false, pollTimer: null,
+  selectedCard: null, showRules: false, detailsOpen: false, detailsTab: null,
+  joinCodeDraft: "", homeNameDraft: "", lang: "fr", showJoinField: false,
+  mode: "online", localRoom: null, recapKey: null, recapUntil: 0,
+  trumpAnnounceKey: null, trumpAnnounceDismissed: false,
+  handSoundKey: null, gameOverSoundKey: null, lastScores: null };
+
+function esc(s){ return String(s).replace(/[&<>"']/g, function(m){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]; }); }
+
+function t(key, vars){
+  var dict = STR[client.lang] || STR.fr;
+  var s = dict[key] !== undefined ? dict[key] : (STR.fr[key] !== undefined ? STR.fr[key] : key);
+  if (vars){
+    Object.keys(vars).forEach(function(k){
+      var v = vars[k];
+      if (typeof v === "string" && v.indexOf("{{suit:") === 0){
+        var suitCode = v.slice(7, -2);
+        v = SUIT_SYMBOL[suitCode] + " " + dict["suit_" + suitCode];
+      } else if (typeof v === "string" && v.indexOf("{{card:") === 0){
+        var cardCode = v.slice(7, -2);
+        v = rankOf(cardCode) + SUIT_SYMBOL[suitOf(cardCode)];
+      }
+      s = s.split("{" + k + "}").join(v);
+    });
+  }
+  return s;
+}
+function cardsLabel(n){ return n + " " + (n === 1 ? t("cardWord") : t("cardWordPlural")); }
+function suitFullLabel(suit){
+  var dict = STR[client.lang] || STR.fr;
+  return SUIT_SYMBOL[suit] + " " + dict["suit_" + suit];
+}
+
+function showToast(msg){
+  var host = document.getElementById("pj-toast-host");
+  var el = document.createElement("div");
+  el.className = "pj-toast";
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 3200);
+}
+
+function toastKeyForError(msg){
+  var map = {
+    "not-bidding-phase": "toastNetworkError", "not-your-turn": "toastNetworkError",
+    "dealer-must-bid": "mustBidAtLeast1", "invalid-bid": "toastNetworkError",
+    "not-playing-phase": "toastNetworkError", "card-not-in-hand": "toastNetworkError",
+    "must-follow-suit": "toastNetworkError", "invalid-target": "toastInvalidTarget"
+  };
+  return map[msg] || "toastNetworkError";
+}
+
+async function mutate(fn, opts){
+  opts = opts || {};
+  if (client.busy) return false;
+  client.busy = true;
+  render();
+  try {
+    var latest = client.mode === "local" ? client.localRoom : await loadRoom(client.roomCode);
+    if (!latest){ if (!opts.silent) showToast(t("toastRoomNotFound")); client.busy = false; render(); return false; }
+    var next;
+    try { next = fn(JSON.parse(JSON.stringify(latest))); }
+    catch(err){
+      if (!opts.silent) showToast(t(toastKeyForError(err.message)));
+      client.room = latest; client.busy = false; render();
+      return false;
+    }
+    if (next === false){ client.room = latest; client.busy = false; render(); return false; }
+    next.version = (latest.version||0) + 1;
+    if (client.mode === "local") client.localRoom = next;
+    else await saveRoom(client.roomCode, next);
+    client.room = next;
+    if (opts.selectClear) client.selectedCard = null;
+    return true;
+  } catch(e){
+    if (!opts.silent) showToast(t("toastNetworkError"));
+    return false;
+  } finally {
+    client.busy = false;
+    render();
+  }
+}
+async function pollOnce(){
+  if (!client.roomCode || client.busy) return;
+  var r = await loadRoom(client.roomCode);
+  if (!r) return;
+  var changed = !client.room || r.version !== client.room.version;
+  client.room = r;
+  if (changed) render();
+}
+function startPolling(){
+  if (client.pollTimer) clearInterval(client.pollTimer);
+  client.pollTimer = setInterval(pollOnce, 2500);
+}
+
+window.pjSetLang = function(lang){ client.lang = lang; render(); };
+
+window.pjCreateRoom = async function(){
+  var name = (client.homeNameDraft || "").trim();
+  if (!name){ showToast(t("toastEnterName")); return; }
+  var code = genRoomCode();
+  var state = freshRoomState(code, name);
+  await saveRoom(code, state);
+  client.myName = name; client.roomCode = code; client.room = state;
+  startPolling(); render();
+};
+window.pjStartLocalGame = function(){
+  var name = (client.homeNameDraft || "").trim();
+  if (!name){ showToast(t("toastEnterName")); return; }
+  var state = freshRoomState("LOCAL", name);
+  client.mode = "local";
+  client.myName = name; client.roomCode = null; client.localRoom = state; client.room = state;
+  render();
+};
+
+window.pjJoinRoom = async function(){
+  var code = (client.joinCodeDraft || "").trim().toUpperCase();
+  var name = (client.homeNameDraft || "").trim();
+  if (!name){ showToast(t("toastEnterName")); return; }
+  if (!code){ showToast(t("toastEnterCode")); return; }
+  var room = await loadRoom(code);
+  if (!room){ showToast(t("toastTableNotFound")); return; }
+  if (room.players.indexOf(name) !== -1){
+    client.myName = name; client.roomCode = code; client.room = room;
+    startPolling(); render(); return;
+  }
+  if (room.phase !== "lobby"){ showToast(t("toastGameStarted")); return; }
+  if (room.players.length >= MAX_PLAYERS){ showToast(t("toastTableFull")); return; }
+  room.players.push(name);
+  room.scores[name] = 0;
+  pushLog(room, "log_playerJoined", { name: name });
+  room.version += 1;
+  await saveRoom(code, room);
+  client.myName = name; client.roomCode = code; client.room = room;
+  startPolling(); render();
+};
+
+window.pjLeaveTable = function(){
+  var inActiveGame = client.room && client.room.phase !== "lobby" && client.room.phase !== "gameOver";
+  var confirmKey = client.mode === "local" ? "confirmLeaveActiveGameLocal" : "confirmLeaveActiveGame";
+  if (inActiveGame && !window.confirm(t(confirmKey))) return;
+  if (client.pollTimer) clearInterval(client.pollTimer);
+  if (turnAlert.flashTimer){ clearInterval(turnAlert.flashTimer); turnAlert.flashTimer = null; }
+  if (botDriver.timer){ clearTimeout(botDriver.timer); botDriver.timer = null; }
+  if (recapTimer){ clearTimeout(recapTimer); recapTimer = null; }
+  client.trumpAnnounceKey = null; client.trumpAnnounceDismissed = false;
+  client.handSoundKey = null; client.gameOverSoundKey = null; client.lastScores = null;
+  if (anthemAudio){ try { anthemAudio.pause(); } catch(e){} anthemAudio = null; }
+  client.recapKey = null; client.recapUntil = 0;
+  botDriver.key = null;
+  document.title = "Pidjou";
+  turnAlert.key = null;
+  client.myName = null; client.roomCode = null; client.room = null; client.selectedCard = null;
+  client.mode = "online"; client.localRoom = null;
+  render();
+};
+window.pjStartHand = function(){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    if (s.players.length < MIN_PLAYERS) throw new Error("need-2");
+    startHand(s); return s;
+  });
+};
+window.pjBid = function(amount){ mutate(function(s){ placeBid(s, client.myName, amount); return s; }); };
+window.pjChooseTrump = function(suit){ mutate(function(s){ chooseTrump(s, client.myName, suit); return s; }); };
+window.pjSelectCard = function(card){
+  var room = client.room;
+  if (!room || room.phase !== "playing") return;
+  if (room.players[room.turnIndex] !== client.myName) return;
+  var legal = legalCards(room.hands[client.myName], room.currentTrick, room.trump);
+  if (legal.indexOf(card) === -1) return;
+  client.selectedCard = (client.selectedCard === card) ? null : card;
+  render();
+};
+window.pjCardBlocked = function(){
+  var room = client.room;
+  if (!room || room.phase !== "playing" || !room.currentTrick.length) return;
+  var ledSuit = suitOf(room.currentTrick[0].card);
+  showToast(t("toastMustFollow", { suit: suitFullLabel(ledSuit) }));
+};
+window.pjConfirmPlay = function(){
+  if (!client.selectedCard) return;
+  var card = client.selectedCard;
+  mutate(function(s){ playCard(s, client.myName, card); return s; }, { selectClear: true });
+};
+window.pjNextHand = function(){
+  mutate(function(s){
+    if (s.phase !== "handSummary") return false;
+    if (s.winner){ s.phase = "gameOver"; return s; }
+    startHand(s); return s;
+  });
+};
+window.pjNewGame = function(){
+  if (anthemAudio){ try { anthemAudio.pause(); } catch(e){} anthemAudio = null; }
+  mutate(function(s){
+    if (s.phase !== "gameOver") return false;
+    s.players.forEach(function(p){ s.scores[p] = 0; });
+    s.dealerIndex = -1; s.handNumber = 0; s.gameNumber = (s.gameNumber || 1) + 1; s.winner = null; s.gameHistory = [];
+    pushLog(s, "log_newGame", {});
+    startHand(s); return s;
+  });
+};
+window.pjSetTarget = function(val){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    var v = parseInt(val, 10);
+    if (!v || v < 5 || v > 200) throw new Error("invalid-target");
+    s.targetScore = v; return s;
+  }).then(function(ok){ if (ok) showToast(t("toastTargetSaved")); });
+};
+window.pjSetDealer = function(name){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    if (s.players.indexOf(name) === -1) return false;
+    s.chosenDealer = name; return s;
+  });
+};
+window.pjAddBot = function(difficulty){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    if (s.players.length >= MAX_PLAYERS) return false;
+    if (BOT_DIFFICULTIES.indexOf(difficulty) === -1) return false;
+    var i = 1, name;
+    do { name = t("botNamePrefix") + " " + i; i++; } while (s.players.indexOf(name) !== -1);
+    s.players.push(name);
+    s.scores[name] = 0;
+    s.bots = s.bots || {};
+    s.bots[name] = difficulty;
+    pushLog(s, "log_botAdded", { name: name, difficulty: t("botDifficulty_" + difficulty) });
+    return s;
+  });
+};
+window.pjRemoveBot = function(name){
+  mutate(function(s){
+    if (s.phase !== "lobby") return false;
+    var idx = s.players.indexOf(name);
+    if (idx === -1 || !s.bots || !s.bots[name]) return false;
+    s.players.splice(idx, 1);
+    delete s.scores[name];
+    delete s.bots[name];
+    if (s.chosenDealer === name) s.chosenDealer = s.players[0];
+    return s;
+  });
+};
+window.pjToggleRules = function(){ client.showRules = !client.showRules; render(); };
+window.pjCopyCode = function(){
+  try { navigator.clipboard.writeText(client.roomCode); showToast(t("toastCodeCopied",{code:client.roomCode})); }
+  catch(e){ showToast(t("toastCode",{code:client.roomCode})); }
+};
+window.pjDraft = function(field, val){ client[field] = val; };
+window.pjToggleJoinField = function(){ client.showJoinField = !client.showJoinField; render(); };
+
+// ============================== RENDER ==============================
+function handStripHtml(r, interactive){
+  var myHand = r.hands[client.myName] || [];
+  if (!myHand.length) return "";
+  var isMyTurn = interactive && r.players[r.turnIndex] === client.myName;
+  var legal = isMyTurn ? legalCards(myHand, r.currentTrick, r.trump) : [];
+  var handRow = myHand.map(function(c){
+    var playable = isMyTurn && legal.indexOf(c) !== -1;
+    var blocked = isMyTurn && !playable;
+    return cardEl(c, {
+      playable: playable,
+      unplayable: blocked,
+      selected: client.selectedCard === c,
+      onclick: playable ? ("pjSelectCard('" + c + "')") : (blocked ? "pjCardBlocked()" : "")
+    });
+  }).join("");
+  return '<div class="pj-hand-wrap">'
+    + '<div class="pj-hand-row">' + handRow + "</div>"
+    + (interactive && client.selectedCard ? '<div style="text-align:center;margin-top:10px;"><button class="btn-primary" onclick="pjConfirmPlay()">' + esc(t("playBtn",{card: rankOf(client.selectedCard)+SUIT_SYMBOL[suitOf(client.selectedCard)]})) + "</button></div>" : "")
+  + "</div>";
+}
+function cardEl(card, opts){
+  opts = opts || {};
+  var cls = ["pj-card"];
+  if (isRed(card)) cls.push("red");
+  if (opts.mini) cls.push("mini");
+  if (opts.playable) cls.push("playable");
+  if (opts.unplayable) cls.push("unplayable");
+  if (opts.selected) cls.push("selected");
+  var onclick = opts.onclick ? ('onclick="' + opts.onclick + '"') : "";
+  return '<div class="' + cls.join(" ") + '" ' + onclick + '>'
+    + "<div>" + esc(rankOf(card)) + "</div>"
+    + '<div class="suit">' + SUIT_SYMBOL[suitOf(card)] + "</div>"
+    + "</div>";
+}
+function flagSvg(){
+  return '<svg viewBox="0 0 90 60" width="26" height="18" style="display:block;border-radius:2px;">'
+    + '<rect x="0" y="0" width="22.5" height="60" fill="#002674"/>'
+    + '<rect x="22.5" y="0" width="45" height="60" fill="#FCD022"/>'
+    + '<rect x="67.5" y="0" width="22.5" height="60" fill="#007C2E"/>'
+    + '<polygon points="35,13 40,21 35,29 30,21" fill="#007C2E"/>'
+    + '<polygon points="55,13 60,21 55,29 50,21" fill="#007C2E"/>'
+    + '<polygon points="45,25 50,33 45,41 40,33" fill="#007C2E"/>'
+  + "</svg>";
+}
+function langToggleHtml(){
+  return '<div class="pj-lang-toggle">'
+    + '<button class="flag-btn' + (anthemAudio?' flag-btn-playing':'') + '" title="' + esc(t("playAnthemTitle")) + '" onclick="pjPlayAnthem()">' + flagSvg() + (anthemAudio?'<span class="flag-btn-stop">\u25a0</span>':'') + "</button>"
+    + '<button class="lang-btn ' + (client.lang==="fr"?"active":"") + '" onclick="pjSetLang(\'fr\')">FR</button>'
+    + '<button class="lang-btn ' + (client.lang==="en"?"active":"") + '" onclick="pjSetLang(\'en\')">EN</button>'
+    + "</div>";
+}
+var anthemAudio = null;
+function startAnthem(opts){
+  opts = opts || {};
+  if (anthemAudio) return;
+  var fallbackUrl = "https://commons.wikimedia.org/wiki/File:National_anthem_of_Saint_Vincent_and_the_Grenadines,_performed_by_the_United_States_Navy_Band.oga";
+  var audioUrl = "https://upload.wikimedia.org/wikipedia/commons/b/b3/National_anthem_of_Saint_Vincent_and_the_Grenadines,_performed_by_the_United_States_Navy_Band.oga";
+  try {
+    var audio = new Audio(audioUrl);
+    var fell = false;
+    function fallback(){
+      if (fell) return; fell = true;
+      if (anthemAudio === audio) { anthemAudio = null; render(); }
+      if (!opts.silent) window.open(fallbackUrl, "_blank");
+    }
+    audio.addEventListener("error", fallback);
+    audio.addEventListener("ended", function(){ if (anthemAudio === audio) { anthemAudio = null; render(); } });
+    var p = audio.play();
+    if (p && p.catch) p.catch(fallback);
+    anthemAudio = audio;
+    render();
+    if (!opts.silent) showToast(t("toastAnthemPlaying"));
+  } catch(e){ if (!opts.silent) window.open(fallbackUrl, "_blank"); }
+}
+window.pjPlayAnthem = function(){
+  if (anthemAudio){
+    anthemAudio.pause();
+    anthemAudio = null;
+    render();
+    return;
+  }
+  startAnthem({ silent: false });
+};
+function rulesBox(target){
+  var dict = STR[client.lang] || STR.fr;
+  return '<div class="pj-rules-box">' + dict.rulesHtml.split("{target}").join(target) + "</div>";
+}
+function renderHome(){
+  document.getElementById("pj-tagline").textContent = t("tagline");
+  document.getElementById("pj-topbar-right").innerHTML = langToggleHtml();
+  var app = document.getElementById("pj-app");
+  app.innerHTML =
+    '<div class="pj-center">'
+      + '<div class="pj-card-suit-row" style="text-align:center;">\u2660 \u2665 \u2666 \u2663</div>'
+      + '<div class="pj-panel">'
+        + '<label class="pj-field-label">' + esc(t("yourName")) + "</label>"
+        + '<input type="text" placeholder="' + esc(t("namePlaceholder")) + '" value="' + esc(client.homeNameDraft||"") + '" oninput="pjDraft(\'homeNameDraft\', this.value)" maxlength="18" />'
+        + '<div style="height:14px"></div>'
+        + '<button class="btn-primary" style="width:100%" onclick="pjCreateRoom()">' + esc(t("createTableBtn")) + "</button>"
+        + '<div style="height:8px"></div>'
+        + '<button class="btn-ghost" style="width:100%" onclick="pjToggleJoinField()">' + esc(t("joinTableBtn")) + "</button>"
+        + (client.showJoinField
+            ? ('<div style="margin-top:10px;">'
+                + '<label class="pj-field-label">' + esc(t("tableCode")) + "</label>"
+                + '<input type="text" placeholder="ABCD" style="text-transform:uppercase" value="' + esc(client.joinCodeDraft||"") + '" oninput="pjDraft(\'joinCodeDraft\', this.value)" maxlength="4" />'
+                + '<div style="height:8px"></div>'
+                + '<button class="btn-primary" style="width:100%" onclick="pjJoinRoom()">' + esc(t("joinBtn")) + "</button>"
+              + "</div>")
+            : "")
+        + '<div style="height:8px"></div>'
+        + '<button class="btn-ghost" style="width:100%" onclick="pjStartLocalGame()">' + esc(t("playVsComputerBtn")) + "</button>"
+      + "</div>"
+      + '<div class="pj-rules-toggle"><a onclick="pjToggleRules()">' + esc(client.showRules?t("hideRules"):t("showRules")) + "</a></div>"
+      + (client.showRules ? '<div class="pj-panel">' + rulesBox(DEFAULT_TARGET) + "</div>" : "")
+    + "</div>";
+}
+function renderTopbarRoom(){
+  var r = client.room;
+  document.getElementById("pj-tagline").textContent = "";
+  document.getElementById("pj-topbar-right").innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;">'
+    + langToggleHtml()
+    + '<button class="btn-small pj-help-btn" onclick="pjToggleRules()" title="' + esc(t("showRules")) + '">?</button>'
+    + (client.mode === "local" ? "" : ('<span class="pj-room-chip" onclick="pjCopyCode()" title="Copy">' + esc(r.code) + "</span>"))
+    + '<button class="btn-small" onclick="pjLeaveTable()">' + esc(t("leaveBtn")) + "</button>"
+    + "</div>";
+}
+function renderLobby(){
+  var r = client.room;
+  renderTopbarRoom();
+  var isHost = r.players[0] === client.myName;
+  var app = document.getElementById("pj-app");
+  var seats = "";
+  for (var i=0;i<MAX_PLAYERS;i++){
+    if (r.players[i]){
+      var pname = r.players[i];
+      var isBot = r.bots && r.bots[pname];
+      seats += "<li><span class=\"pj-seat-num\">" + (i+1) + "</span>" + esc(pname)
+        + (isBot ? ' <span class="pj-bot-tag">\ud83e\udd16 ' + esc(t("botDifficulty_" + r.bots[pname])) + "</span>" : "")
+        + (pname===client.myName ? ' <span style="color:var(--brass-bright);font-size:12px;">' + esc(t("youTag")) + "</span>" : "")
+        + (i===0 ? ' <span style="color:var(--text-dim);font-size:11px;">\u2014 ' + esc(t("host")) + "</span>" : "")
+        + (isBot && isHost ? ' <a class="pj-bot-remove" onclick="pjRemoveBot(\'' + esc(pname) + '\')">\u2715</a>' : "")
+        + "</li>";
+    } else if (isHost && r.players.length < MAX_PLAYERS) {
+      seats += '<li class="pj-seat-addbot"><span class="pj-seat-num">' + (i+1) + '</span>'
+        + '<span class="pj-add-bot-label">' + esc(t("addBotLabel")) + "</span>"
+        + '<span class="pj-add-bot-btns">'
+        + BOT_DIFFICULTIES.map(function(d){ return '<button class="btn-small" onclick="pjAddBot(\'' + d + '\')">' + esc(t("botDifficulty_" + d)) + "</button>"; }).join("")
+        + "</span></li>";
+    } else {
+      seats += '<li><span class="pj-seat-num">' + (i+1) + '</span><span class="pj-seat-empty">' + esc(t("emptySeat")) + "</span></li>";
+    }
+  }
+  app.innerHTML =
+    '<div class="pj-center">'
+      + (client.mode === "local"
+          ? ('<div class="pj-lobby-code"><div class="hint">' + esc(t("localModeBadge")) + "</div></div>")
+          : ('<div class="pj-lobby-code">'
+              + '<div class="hint">' + esc(t("shareCodeHint")) + "</div>"
+              + '<div class="code">' + esc(r.code) + "</div>"
+            + "</div>"))
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("playersTitle")) + " (" + r.players.length + "/" + MAX_PLAYERS + ")</h3>"
+        + '<ul class="pj-seat-list">' + seats + "</ul>"
+      + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("firstDealerTitle")) + "</h3>"
+        + (isHost
+            ? '<select class="pj-select" onchange="pjSetDealer(this.value)">' + r.players.map(function(p){ return '<option value="' + esc(p) + '" ' + (p===r.chosenDealer?"selected":"") + '>' + esc(p) + '</option>'; }).join("") + "</select>"
+            : '<p style="color:var(--text-dim);font-size:14px;">' + esc(r.chosenDealer) + "</p>")
+      + "</div>"
+      + '<div class="pj-panel">'
+        + '<h3 class="disp">' + esc(t("targetScoreTitle")) + "</h3>"
+        + '<div class="pj-row"><input type="text" inputmode="numeric" id="pj-target-input" value="' + r.targetScore + '" ' + (isHost?"":"disabled") + " />"
+        + (isHost ? '<button class="btn-small" onclick="pjSetTarget(document.getElementById(\'pj-target-input\').value)">' + esc(t("validateBtn")) + "</button>" : "")
+        + "</div>"
+      + "</div>"
+      + '<button class="btn-primary" style="width:100%" ' + (r.players.length<MIN_PLAYERS?"disabled":"") + ' onclick="pjStartHand()">'
+        + esc(r.players.length<MIN_PLAYERS ? t("waitingPlayers") : t("dealStartBtn"))
+      + "</button>"
+      + '<div class="pj-rules-toggle"><a onclick="pjToggleRules()">' + esc(client.showRules?t("hideRules"):t("showRules")) + "</a></div>"
+      + (client.showRules ? '<div class="pj-panel">' + rulesBox(r.targetScore) + "</div>" : "")
+    + "</div>";
+}
+function ledgerInner(){
+  var r = client.room;
+  return '<table><thead><tr><th class="name-col">' + esc(t("playerCol")) + "</th><th>" + esc(t("scoreCol")) + "</th></tr></thead><tbody>"
+    + r.players.map(function(p){ return '<tr><td class="name-col">' + esc(p) + (p===client.myName?" \u2022":"") + "</td><td>" + r.scores[p] + "</td></tr>"; }).join("")
+    + "</tbody></table>"
+    + '<div style="text-align:center;margin-top:8px;color:var(--text-dim);font-size:11px;">' + esc(t("ledgerFooter", {target: r.targetScore, hand: r.handNumber})) + "</div>";
+}
+function livePointsInner(r){
+  var points = computePointsSnapshot(r.trickLog, r.players, r.trump, false, r.pitcher);
+  return '<div class="pj-summary-points">' + points.map(function(pt){
+    return '<div class="pt-row"><span class="label">' + esc(pointLabel(pt)) + '</span><span class="who">' + (pt.winner ? esc(pt.winner) : "\u2014") + ' <span style="opacity:.6">(' + esc(livePointDetail(pt)) + ")</span></span></div>";
+  }).join("") + "</div>";
+}
+function trickHistoryInner(r){
+  if (!r.trickLog.length) return '<p style="color:var(--text-dim);font-size:13px;text-align:center;">' + esc(t("trickPending")) + "</p>";
+  return r.trickLog.map(function(trick, i){
+    var cardsHtml = trick.cards.map(function(c){
+      var isWinner = c.player === trick.winner;
+      return '<div class="pj-trick-card' + (isWinner?' pj-trick-card-winner':'') + '"><div class="who">' + esc(c.player) + (isWinner?' \ud83c\udfc6':'') + "</div>" + cardEl(c.card,{mini:true}) + "</div>";
+    }).join("");
+    return '<div class="pj-history-row">'
+      + '<div class="pj-history-num">' + esc(t("trickNumLabel",{n:i+1})) + "</div>"
+      + '<div class="pj-trick-area" style="min-height:auto;">' + cardsHtml + "</div>"
+    + "</div>";
+  }).join("");
+}
+function logInner(r){
+  if (!r.log.length) return '<p style="color:var(--text-dim);font-size:13px;text-align:center;">\u2014</p>';
+  return '<div class="pj-log">' + r.log.slice(-20).map(function(l){ return esc(logLine(l)); }).join("<br/>") + "</div>";
+}
+window.pjSetDetailsTab = function(tab){ client.detailsTab = tab; render(); };
+window.pjDismissTrumpAnnounce = function(){ client.trumpAnnounceDismissed = true; render(); };
+window.pjToggleDetails = function(){
+  client.detailsOpen = !client.detailsOpen;
+  if (client.detailsOpen && !client.detailsTab){
+    client.detailsTab = client.room && client.room.phase === "handSummary" ? "tricks" : "points";
+  }
+  render();
+};
+function detailsPanelHtml(r){
+  var tab = client.detailsTab || "points";
+  if (tab === "scores") tab = "points"; // legacy fallback if somehow still selected
+  var tabs = [
+    { key: "points", label: t("tabPoints") },
+    { key: "tricks", label: t("tabTricks") },
+    { key: "log", label: t("tabLog") }
+  ];
+  var tabBtns = tabs.map(function(tb){
+    return '<button class="pj-tab-btn' + (tab===tb.key?" active":"") + '" onclick="pjSetDetailsTab(\'' + tb.key + '\')">' + esc(tb.label) + "</button>";
+  }).join("");
+  var content = "";
+  if (tab === "points") content = livePointsInner(r);
+  else if (tab === "tricks") content = trickHistoryInner(r);
+  else content = logInner(r);
+  return '<div class="pj-panel pj-details-panel">'
+    + '<div class="pj-tabs">' + tabBtns + "</div>"
+    + content
+  + "</div>";
+}
+function pointDetail(pt){
+  if (pt.kind === "card"){
+    return pt.card ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : "\u2014";
+  }
+  if (pt.kind === "jack") return pt.winner ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("notDealt");
+  if (pt.kind === "pidjou") return pt.winner ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("notDealt");
+  if (pt.kind === "game") return pt.tie ? t("gameTieDetail", {n: pt.total}) : t("cardPointsSuffix", {n: pt.total});
+  return "";
+}
+function livePointDetail(pt){
+  if (pt.kind === "card") return pt.card ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("liveNotYet");
+  if (pt.kind === "jack") return pt.winner ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("liveNotYet");
+  if (pt.kind === "pidjou") return pt.winner ? (rankOf(pt.card) + SUIT_SYMBOL[suitOf(pt.card)]) : t("liveNotYet");
+  if (pt.kind === "game"){
+    if (pt.winner) return t("cardPointsSuffix", {n: pt.total});
+    if (pt.tie && pt.total > 0) return t("liveGameTie", {n: pt.total});
+    return t("liveNotYet");
+  }
+  return "";
+}
+function pointLabel(pt){
+  return pt.label + (pt.value > 1 ? (" (" + pt.value + ")") : "");
+}
+function logLine(entry){
+  return t(entry.key, entry.params);
+}
+function renderTable(){
+  var r = client.room;
+  renderTopbarRoom();
+  var app = document.getElementById("pj-app");
+  var n = r.players.length;
+  var dealer = r.players[r.dealerIndex];
+
+  var chips = r.players.map(function(p){
+    var cls = ["pj-player-chip"];
+    if (p === client.myName) cls.push("is-me");
+    var turnPlayer = null;
+    if (r.phase === "bidding") turnPlayer = r.bidding.order[r.bidding.turnPtr];
+    if (r.phase === "chooseTrump") turnPlayer = r.pitcher;
+    if (r.phase === "playing") turnPlayer = r.players[r.turnIndex];
+    if (turnPlayer === p) cls.push("is-turn");
+    var cardCount = r.hands[p] ? r.hands[p].length : 0;
+    var tag = "";
+    if (p === dealer) tag = '<span class="tag">' + esc(t("dealerTag")) + "</span>";
+    if (p === r.pitcher) tag = '<span class="tag">' + esc(t("pitcherTag")) + "</span>";
+    var meta = cardsLabel(cardCount);
+    if (r.phase === "bidding"){
+      var bid = r.bidding.bids[p];
+      meta = bid === undefined ? t("waitingWord") : (bid === "pass" ? t("passWord") : t("bidWord",{n:bid}));
+    } else if (p === r.pitcher && r.bidding && r.bidding.highest){
+      meta = t("bidWord",{n:r.bidding.highest.amount}) + " \u00b7 " + cardsLabel(cardCount);
+    }
+    var scoreChangedForP = client.lastScores && client.lastScores[p] !== r.scores[p];
+    return '<div class="' + cls.join(" ") + '">' + tag + '<div class="name">' + esc(p) + (r.bots && r.bots[p] ? ' \ud83e\udd16' : '') + '</div><div class="meta">' + esc(meta) + '</div><div class="score' + (scoreChangedForP?' pulse':'') + '">' + esc(t("scoreShort",{n:r.scores[p]})) + "</div></div>";
+  }).join("");
+  var newLastScores = {};
+  r.players.forEach(function(p){ newLastScores[p] = r.scores[p]; });
+  client.lastScores = newLastScores;
+
+  var trumpCorner = "";
+  if (r.phase === "playing" || r.phase === "handSummary"){
+    trumpCorner = r.trump
+      ? '<div class="pj-trump-corner">' + esc(t("trumpBadge",{suit: suitFullLabel(r.trump)})) + "</div>"
+      : '<div class="pj-trump-corner pj-trump-corner-pending">' + esc(t("trumpWillBeChosen",{pitcher:r.pitcher})) + "</div>";
+  }
+
+  var feltInner = "";
+  if (r.phase === "bidding"){
+    var turnPlayer2 = r.bidding.order[r.bidding.turnPtr];
+    var mine = turnPlayer2 === client.myName;
+    feltInner = '<div class="pj-status-line ' + (mine?"mine":"") + '">' + esc(mine ? t("yourTurnBid") : t("thinkingBid",{player:turnPlayer2})) + "</div>";
+  } else if (r.phase === "chooseTrump"){
+    var mineT = r.pitcher === client.myName;
+    feltInner = '<div class="pj-status-line ' + (mineT?"mine":"") + '">' + esc(mineT ? t("yourTurnTrump") : t("thinkingTrump",{player:r.pitcher})) + "</div>";
+  } else if (r.phase === "playing"){
+    var trickCards = r.currentTrick.map(function(c){ return '<div class="pj-trick-card"><div class="who">' + esc(c.player) + "</div>" + cardEl(c.card,{mini:true}) + "</div>"; }).join("");
+    var turnPlayer3 = r.players[r.turnIndex];
+    var mine2 = turnPlayer3 === client.myName;
+    var statusLine = '<div class="pj-status-line ' + (mine2?"mine":"") + '">' + esc(mine2 ? t("yourTurnPlay") : t("playingNow",{player:turnPlayer3})) + "</div>";
+
+    // Announce the freshly-chosen trump + exchange summary to everyone, right as play begins.
+    // This is strategically important (who kept how much trump) so it stays up until dismissed,
+    // not on a timer.
+    var showTrumpAnnounce = false;
+    if (r.trump){
+      var trumpSig = r.handNumber + ":" + r.trump;
+      if (trumpSig !== client.trumpAnnounceKey){
+        client.trumpAnnounceKey = trumpSig;
+        client.trumpAnnounceDismissed = false;
+      }
+      showTrumpAnnounce = !client.trumpAnnounceDismissed;
+    }
+
+    var lastTrickHtml = "";
+    var showRecap = false;
+    if (r.lastTrick){
+      var recapSig = r.lastTrick.winner + ":" + r.lastTrick.card + ":" + (r.trickLog ? r.trickLog.length : 0);
+      if (recapSig !== client.recapKey){
+        client.recapKey = recapSig;
+        client.recapUntil = Date.now() + 3500;
+        if (recapTimer) clearTimeout(recapTimer);
+        recapTimer = setTimeout(function(){ render(); }, 3600);
+        playTrickSound();
+      }
+      showRecap = Date.now() < client.recapUntil;
+    }
+    // The recap stays up for its guaranteed window even if the next trick has already started
+    // underneath (e.g. a bot moved on quickly) — readability first, the live trick catches up after.
+    if (showRecap){
+      var reasonKey = r.lastTrick.wonByTrump ? "wonByTrump" : "wonByLedSuit";
+      var overText = r.lastTrick.runnerUpCard ? (" " + t("overWord") + " " + rankOf(r.lastTrick.runnerUpCard)+SUIT_SYMBOL[suitOf(r.lastTrick.runnerUpCard)]) : "";
+      var lastTrickCards = r.lastTrick.cards.map(function(c){
+        var isWinner = c.player === r.lastTrick.winner && c.card === r.lastTrick.card;
+        return '<div class="pj-trick-card' + (isWinner?' pj-trick-card-winner':'') + '"><div class="who">' + esc(c.player) + (isWinner?' \ud83c\udfc6':'') + "</div>" + cardEl(c.card,{mini:true}) + "</div>";
+      }).join("");
+      lastTrickHtml = '<div class="pj-last-trick">'
+        + '<div class="pj-last-trick-label">' + esc(t("lastTrickLabel")) + "</div>"
+        + '<div class="pj-trick-area" style="min-height:auto;margin-bottom:6px;">' + lastTrickCards + "</div>"
+        + '<div><b>' + esc(r.lastTrick.winner) + '</b> ' + esc(t(reasonKey, {card: rankOf(r.lastTrick.card)+SUIT_SYMBOL[suitOf(r.lastTrick.card)]})) + esc(overText) + "</div>"
+      + "</div>";
+    }
+    if (showTrumpAnnounce && !r.lastTrick){
+      var exchangeLines = "";
+      if (r.exchangeSummary && r.exchangeSummary.length){
+        exchangeLines = '<div class="pj-exchange-summary">' + r.exchangeSummary.map(function(row){
+          return '<div>' + esc(t("exchangeRow", {player: row.player, kept: row.kept, drawn: row.drawn})) + "</div>";
+        }).join("") + "</div>";
+      }
+      feltInner = '<div class="pj-trump-announce">' + esc(t("trumpAnnounceLine", {suit: suitFullLabel(r.trump)})) + "</div>" + exchangeLines
+        + '<div style="text-align:center;"><button class="btn-primary" style="padding:7px 20px;font-size:13px;" onclick="pjDismissTrumpAnnounce()">' + esc(t("gotItBtn")) + "</button></div>";
+    } else {
+      var trickAreaOrRecap = showRecap
+        ? lastTrickHtml
+        : ('<div class="pj-trick-area">' + trickCards + "</div>");
+      feltInner = trickAreaOrRecap + statusLine;
+    }
+  } else if (r.phase === "handSummary"){
+    var s0 = r.lastHandSummary;
+    var bestPlayer0 = r.players[0];
+    r.players.forEach(function(p){ if (s0.deltas[p] > s0.deltas[bestPlayer0]) bestPlayer0 = p; });
+    var bestDelta0 = s0.deltas[bestPlayer0];
+    var bestSign0 = bestDelta0 > 0 ? ("+" + bestDelta0) : String(bestDelta0);
+    var tiedCount0 = r.players.filter(function(p){ return s0.deltas[p] === bestDelta0; }).length;
+    var handSoundSig = "hand:" + (r.gameNumber||1) + ":" + r.handNumber;
+    if (handSoundSig !== client.handSoundKey){
+      client.handSoundKey = handSoundSig;
+      playHandEndSound(s0.made);
+    }
+    feltInner = '<div class="pj-status-line">'
+      + (tiedCount0 > 1
+          ? esc(t("handTieHeadline", {n: bestSign0}))
+          : ("\ud83c\udfc6 <b>" + esc(bestPlayer0) + "</b> " + esc(t("handBestHeadline")) + ' <span style="color:' + (bestDelta0>0?'#7fbf7f':(bestDelta0<0?'var(--rust)':'var(--text-dim)')) + ';font-weight:700;">(' + bestSign0 + ")</span>"))
+    + "</div>";
+  } else if (r.phase === "gameOver"){
+    var winnerIsBot = !!(r.bots && r.bots[r.winner]);
+    if (client.gameOverSoundKey !== r.code + ":" + (r.gameNumber||1) + ":" + r.winner){
+      client.gameOverSoundKey = r.code + ":" + (r.gameNumber||1) + ":" + r.winner;
+      playVictorySound();
+      if (!winnerIsBot) startAnthem({ silent: true });
+    }
+    feltInner = '<div class="pj-status-line">\ud83c\udfc6 ' + esc(t("winnerBanner",{winner:r.winner})) + "</div>"
+      + '<p style="color:var(--text-dim);margin:6px 0 0;">' + esc(t("withPoints",{n:r.scores[r.winner]})) + "</p>"
+      + (winnerIsBot ? "" : ('<p class="pj-official-message">' + esc(t("officialCongrats")) + "</p>"));
+  }
+
+  var bottomPanel = "";
+  if (r.phase === "bidding"){
+    var turnPlayer4 = r.bidding.order[r.bidding.turnPtr];
+    if (turnPlayer4 === client.myName){
+      var isFinalWrapTurn = client.myName === r.bidding.firstBidder;
+      var min = r.bidding.highest.amount + 1;
+      var bidBtns = "";
+      for (var a=min; a<=MAX_BID; a++){ bidBtns += '<button class="bid-btn" onclick="pjBid(' + a + ')">' + a + "</button>"; }
+      bottomPanel = '<div class="pj-panel pj-bid-panel">'
+        + '<h3 class="disp">' + esc(t("yourBidTitle")) + "</h3>"
+        + '<p style="color:var(--text-dim);font-size:13px;">' + esc(t("currentBid",{amount:r.bidding.highest.amount, player:r.bidding.highest.player})) + "</p>"
+        + '<div class="pj-bid-options">' + bidBtns + "</div>"
+        + '<div style="height:10px"></div>'
+        + '<button class="btn-ghost" onclick="pjBid(\'pass\')">' + esc(isFinalWrapTurn ? t("keepBidBtn",{amount:1}) : t("passBtn")) + "</button>"
+      + "</div>";
+    } else {
+      bottomPanel = '<div class="pj-panel" style="text-align:center;color:var(--text-dim);">' + esc(t("thinkingBid",{player:turnPlayer4})) + "</div>";
+    }
+  }
+  if (r.phase === "chooseTrump"){
+    if (r.pitcher === client.myName){
+      var suitBtns = SUITS.map(function(s){
+        var red = RED_SUITS.indexOf(s) !== -1;
+        return '<button class="bid-btn" style="width:60px;height:60px;font-size:26px;' + (red?'color:var(--rust);':'') + '" onclick="pjChooseTrump(\'' + s + '\')">' + SUIT_SYMBOL[s] + "</button>";
+      }).join("");
+      bottomPanel = '<div class="pj-panel pj-bid-panel">'
+        + '<h3 class="disp">' + esc(t("chooseTrumpTitle")) + "</h3>"
+        + '<p style="color:var(--text-dim);font-size:13px;">' + esc(t("chooseTrumpHint")) + "</p>"
+        + '<div class="pj-bid-options">' + suitBtns + "</div>"
+      + "</div>";
+    } else {
+      bottomPanel = '<div class="pj-panel" style="text-align:center;color:var(--text-dim);">' + esc(t("thinkingTrump",{player:r.pitcher})) + "</div>";
+    }
+  }
+  if (r.phase === "bidding" || r.phase === "chooseTrump"){
+    bottomPanel += handStripHtml(r, false);
+  }
+  if (r.phase === "playing"){
+    bottomPanel = handStripHtml(r, true);
+  }
+  if (r.phase === "handSummary"){
+    var s = r.lastHandSummary;
+    var deltaRows = r.players.map(function(p){
+      var d = s.deltas[p];
+      var sign = d > 0 ? ("+" + d) : String(d);
+      var color = d > 0 ? "#7fbf7f" : (d < 0 ? "var(--rust)" : "var(--text-dim)");
+      var pitcherCaption = "";
+      if (p === s.pitcher){
+        pitcherCaption = ' <span style="font-size:11px;color:var(--brass-bright);">(' + esc(t("pitcherNote",{bid:s.bid})) + (s.made ? (", " + esc(t("madeShort"))) : (", " + esc(t("failedShort")))) + ")</span>";
+      }
+      return '<div class="pt-row"><span>' + esc(p) + pitcherCaption + '</span><span style="color:' + color + ';font-weight:700;">' + sign + "</span></div>";
+    }).join("");
+    var ptsHtml = s.points.map(function(pt){
+      return '<div class="pt-row"><span class="label">' + esc(pointLabel(pt)) + '</span><span class="who">' + (pt.winner ? esc(pt.winner) : "\u2014") + ' <span style="opacity:.6">(' + esc(pointDetail(pt)) + ")</span></span></div>";
+    }).join("");
+    bottomPanel = '<div class="pj-panel">'
+      + '<h3 class="disp">' + esc(t("handScoresTitle")) + "</h3>"
+      + '<div class="pj-summary-points">' + deltaRows + "</div>"
+      + '<div class="pj-divider-word">' + esc(t("pointDetailDivider")) + "</div>"
+      + '<div class="pj-summary-points">' + ptsHtml + "</div>"
+      + (r.winner ? ('<p style="text-align:center;color:var(--brass-bright);font-weight:700;margin-top:12px;">\ud83c\udfc6 ' + esc(t("winnerBanner",{winner:r.winner})) + "</p>") : "")
+      + '<button class="btn-primary" style="width:100%;margin-top:10px;" onclick="pjNextHand()">' + esc(r.winner ? t("seeResultBtn") : t("nextHandBtn")) + "</button>"
+    + "</div>";
+  }
+  if (r.phase === "gameOver"){
+    var ranked = r.players.slice().sort(function(a,b){ return r.scores[b] - r.scores[a]; });
+    var medals = ["\ud83e\udd47","\ud83e\udd48","\ud83e\udd49"];
+    var rankRows = ranked.map(function(p, i){
+      var medal = medals[i] || (i+1) + ".";
+      return '<tr' + (p===r.winner?' style="font-weight:700;"':'') + '><td class="name-col">' + medal + " " + esc(p) + (p===client.myName?" \u2022":"") + "</td><td>" + r.scores[p] + "</td></tr>";
+    }).join("");
+    bottomPanel = '<div style="text-align:center;">'
+      + '<button class="btn-primary" onclick="pjNewGame()">' + esc(t("newGameBtn")) + "</button>"
+    + "</div>"
+    + '<div class="pj-ledger" style="margin-top:16px;">'
+      + "<h3>" + esc(t("finalRankingTitle")) + "</h3>"
+      + '<table><thead><tr><th class="name-col">' + esc(t("playerCol")) + "</th><th>" + esc(t("scoreCol")) + "</th></tr></thead><tbody>" + rankRows + "</tbody></table>"
+    + "</div>";
+  }
+
+  var showDetailsToggle = r.phase !== "lobby" && r.phase !== "gameOver";
+
+  app.innerHTML =
+    '<div class="pj-table-wrap">'
+      + '<div class="pj-target-line">' + esc(t("targetLine",{n:r.targetScore})) + "</div>"
+      + (client.showRules ? ('<div class="pj-panel">' + rulesBox(r.targetScore) + "</div>") : "")
+      + '<div class="pj-top-row"><div class="pj-players-strip">' + chips + "</div>" + trumpCorner + "</div>"
+      + '<div class="pj-felt">' + feltInner + "</div>"
+      + bottomPanel
+      + (showDetailsToggle ? ('<div style="text-align:center;margin:12px 0 0;"><a style="color:var(--text-dim);font-size:12.5px;cursor:pointer;text-decoration:underline;" onclick="pjToggleDetails()">' + esc(client.detailsOpen?t("hideDetails"):t("showDetails")) + "</a></div>") : "")
+      + (client.detailsOpen && showDetailsToggle ? detailsPanelHtml(r) : "")
+    + "</div>";
+}
+var turnAlert = { key: null, flashTimer: null };
+var recapTimer = null;
+function computeCurrentTurnKey(){
+  var r = client.room;
+  if (!r || !r.phase) return null;
+  if (r.phase === "bidding") return "bid:" + r.handNumber + ":" + r.bidding.turnPtr;
+  if (r.phase === "chooseTrump") return "trump:" + r.handNumber;
+  if (r.phase === "playing") return "play:" + r.handNumber + ":" + r.trickLog.length + ":" + r.turnIndex;
+  return null;
+}
+function isMyTurnNow(){
+  var r = client.room;
+  if (!r || !client.myName) return false;
+  if (r.phase === "bidding") return r.bidding.order[r.bidding.turnPtr] === client.myName;
+  if (r.phase === "chooseTrump") return r.pitcher === client.myName;
+  if (r.phase === "playing") return r.players[r.turnIndex] === client.myName;
+  return false;
+}
+function playBeep(){
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    var ctx = new Ctx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+    setTimeout(function(){ try { ctx.close(); } catch(e){} }, 500);
+  } catch(e){}
+}
+function playMelody(notes){
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    var ctx = new Ctx();
+    var maxEnd = 0;
+    notes.forEach(function(n){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = n.freq;
+      var t0 = ctx.currentTime + (n.at || 0);
+      var dur = n.dur || 0.3;
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.16, t0 + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + dur + 0.05);
+      maxEnd = Math.max(maxEnd, (n.at || 0) + dur);
+    });
+    setTimeout(function(){ try { ctx.close(); } catch(e){} }, (maxEnd + 0.5) * 1000);
+  } catch(e){}
+}
+function playTrickSound(){ playMelody([{ freq: 660, at: 0, dur: 0.12 }]); }
+function playHandEndSound(made){
+  if (made) playMelody([{ freq: 523, at: 0, dur: 0.15 }, { freq: 659, at: 0.13, dur: 0.25 }]);
+  else playMelody([{ freq: 392, at: 0, dur: 0.22 }]);
+}
+function playVictorySound(){ playMelody([{ freq: 523, at: 0, dur: 0.15 }, { freq: 659, at: 0.14, dur: 0.15 }, { freq: 784, at: 0.28, dur: 0.45 }]); }
+function flashTitleBriefly(){
+  if (turnAlert.flashTimer) clearInterval(turnAlert.flashTimer);
+  var count = 0;
+  turnAlert.flashTimer = setInterval(function(){
+    count++;
+    document.title = (count % 2 === 1) ? ("\ud83c\udfb4 " + t("yourTurnTitleFlash")) : "Pidjou";
+    if (count >= 6){ clearInterval(turnAlert.flashTimer); turnAlert.flashTimer = null; document.title = "Pidjou"; }
+  }, 700);
+}
+function checkTurnAlert(){
+  var key = computeCurrentTurnKey();
+  var mine = isMyTurnNow();
+  if (mine && key && key !== turnAlert.key){
+    turnAlert.key = key;
+    playBeep();
+    flashTitleBriefly();
+  } else if (!mine){
+    turnAlert.key = key;
+  }
+}
+var botDriver = { key: null, timer: null };
+function currentActor(){
+  var r = client.room;
+  if (!r) return null;
+  if (r.phase === "bidding") return r.bidding.order[r.bidding.turnPtr];
+  if (r.phase === "chooseTrump") return r.pitcher;
+  if (r.phase === "playing") return r.players[r.turnIndex];
+  return null;
+}
+function maybeDriveBots(){
+  var r = client.room;
+  if (!r || !r.bots) return;
+  var actor = currentActor();
+  if (!actor || !r.bots[actor]) { botDriver.key = null; return; }
+  var key = computeCurrentTurnKey();
+  if (key === botDriver.key) return; // already scheduled/played for this exact turn
+  botDriver.key = key;
+  if (botDriver.timer) clearTimeout(botDriver.timer);
+  var delay = 700 + Math.random() * 1100;
+  botDriver.timer = setTimeout(function(){
+    var room = client.room;
+    if (!room || computeCurrentTurnKey() !== key) return; // state moved on already
+    var botName = actor, difficulty = room.bots[botName];
+    if (room.phase === "bidding"){
+      var amount = botDecideBid(botName, difficulty, room);
+      mutate(function(s){ placeBid(s, botName, amount); return s; }, { silent: true });
+    } else if (room.phase === "chooseTrump"){
+      var suit = botDecideTrump(botName, room);
+      mutate(function(s){ chooseTrump(s, botName, suit); return s; }, { silent: true });
+    } else if (room.phase === "playing"){
+      var card = botDecideCard(botName, difficulty, room);
+      if (card) mutate(function(s){ playCard(s, botName, card); return s; }, { silent: true });
+    }
+  }, delay);
+}
+function render(){
+  if (!STORAGE_CONFIGURED){
+    document.getElementById("pj-topbar-right").innerHTML = "";
+    document.getElementById("pj-app").innerHTML =
+      '<div class="pj-center"><div class="pj-panel" style="border-color:var(--rust);">'
+      + '<h3 class="disp" style="color:var(--rust);">Configuration requise</h3>'
+      + '<p style="font-size:14px;line-height:1.6;color:var(--text-light);">Ce fichier n\'est pas encore reli\u00e9 \u00e0 une base de donn\u00e9es. Ouvre le fichier <code>pidjou.html</code>, cherche la ligne <code>FIREBASE_DB_URL</code> tout en haut du script, et remplace-la par ton URL Firebase (voir les instructions fournies).</p>'
+      + '</div></div>';
+    return;
+  }
+  if (!client.room) renderHome();
+  else if (client.room.phase === "lobby") renderLobby();
+  else renderTable();
+  checkTurnAlert();
+  maybeDriveBots();
+}
+window.addEventListener("beforeunload", function(e){
+  if (client.room && client.room.phase !== "lobby" && client.room.phase !== "gameOver"){
+    e.preventDefault();
+    e.returnValue = "";
+    return "";
+  }
+});
+render();
+})();
+</script>
+</body>
+</html>
